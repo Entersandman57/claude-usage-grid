@@ -94,6 +94,9 @@ Verified on 2026-09-30. You use Claude Code **only in the desktop app's Code tab
 6. **Data in `~/.claude-usage-grid/`**, with installed copies of the collector scripts.
 7. **Hooks record the surface.** They log `CLAUDE_CODE_ENTRYPOINT` (e.g. `claude-desktop`), a label, never text.
 8. **Merge, don't overwrite.** Phase 1 merges into your existing `settings.json`, keeping `"theme": "dark"`, and shows the diff first.
+9. **Small drops are noise, not resets (Phase 2).** Only a drop of at least `reset_drop_threshold_pp` (3) counts as a manual reset. The meter (e.g. 13.0 from 0.13) and the status line (e.g. 12) round differently, and a 1-point dip must not re-count the whole value. A high-water mark keeps the same points from being counted twice. Cost: a genuine manual reset from under 3% is missed, undercounting by at most 3 points.
+10. **Backfill days only before the hooks start.** `list_sessions()` gives only start and last-change times, and a transcript can change without new activity. So those times count only for moments before the first hook event; after that, hooks and status-line readings decide which days a session was active.
+11. **The first tracked day is partial.** The first-ever reading is only a baseline, so usage before it is unknown. Days before it get `usage_known: false`, which lets the UI say "not tracked yet" instead of "0%".
 
 ## Architecture
 

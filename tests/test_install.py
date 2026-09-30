@@ -88,6 +88,18 @@ def test_plist_schedules_hourly_meter(paths):
     assert plist["RunAtLoad"] is False
 
 
+def test_installed_aggregator_runs_from_bin(paths):
+    import os
+    import subprocess
+    install.install_collectors(paths)
+    assert sorted(os.listdir(paths.bin)) == sorted(name for _, name in install.INSTALLED_FILES)
+    env = dict(os.environ, CLAUDE_USAGE_GRID_HOME=paths.grid)
+    result = subprocess.run(["/usr/bin/python3", os.path.join(paths.bin, "aggregate.py")], env=env,
+                            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    assert result.returncode == 0, result.stderr.decode()
+    assert os.path.exists(os.path.join(paths.grid, "out", "snapshot.json"))
+
+
 def test_plan_writes_nothing(paths, capsys):
     install.plan(paths)
     out = capsys.readouterr().out

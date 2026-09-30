@@ -10,7 +10,10 @@ COLLECTORS = os.path.join(REPO, "collectors")
 FIXTURES = os.path.join(REPO, "tests", "fixtures")
 SYSTEM_PYTHON = "/usr/bin/python3"  # the collectors' real runtime (3.9)
 
+AGGREGATOR = os.path.join(REPO, "aggregator")
+
 sys.path.insert(0, COLLECTORS)
+sys.path.insert(0, AGGREGATOR)
 sys.path.insert(0, os.path.join(REPO, "scripts"))
 
 

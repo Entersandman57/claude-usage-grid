@@ -5,7 +5,7 @@
   install.py apply   back up settings.json, then install everything
 
 apply, in order (scripts exist before settings.json points at them):
-  1. copy collectors/*.py to ~/.claude-usage-grid/bin/
+  1. copy the collectors and the aggregator to ~/.claude-usage-grid/bin/
   2. create ~/.claude-usage-grid/venv with claude-agent-sdk (for backfill.py)
   3. write config.json (claude_bin, and wrapped_statusline if you had a status line)
   4. back up ~/.claude/settings.json (the pristine original is kept once, for
@@ -33,7 +33,11 @@ SDK_REQUIREMENT = "claude-agent-sdk==0.2.162"
 LABEL = "local.claude-usage-grid.meter"
 HOOK_EVENTS = ("SessionStart", "UserPromptSubmit")
 HOOK_TIMEOUT_SECONDS = 5
-COLLECTOR_FILES = ("common.py", "statusline.py", "hook.py", "meter.py", "backfill.py")
+INSTALLED_FILES = (  # (repo directory, file) -> ~/.claude-usage-grid/bin/file
+    ("collectors", "common.py"), ("collectors", "statusline.py"), ("collectors", "hook.py"),
+    ("collectors", "meter.py"), ("collectors", "backfill.py"),
+    ("aggregator", "aggregate.py"), ("aggregator", "aggregator-config.json"),
+)
 
 
 class Paths:
@@ -170,10 +174,10 @@ def ensure_venv(paths):
 
 def install_collectors(paths):
     os.makedirs(paths.bin, exist_ok=True)
-    for name in COLLECTOR_FILES:
+    for directory, name in INSTALLED_FILES:
         target = os.path.join(paths.bin, name)
-        shutil.copyfile(os.path.join(REPO, "collectors", name), target)
-        os.chmod(target, 0o755)
+        shutil.copyfile(os.path.join(REPO, directory, name), target)
+        os.chmod(target, 0o755 if name.endswith(".py") else 0o644)
 
 
 def load_launch_agent(paths):
@@ -201,7 +205,7 @@ def plan(paths):
     print(plist_bytes(paths).decode("utf-8").strip())
 
     print("\n== Files ==")
-    print("%s/: %s" % (paths.bin, ", ".join(COLLECTOR_FILES)))
+    print("%s/: %s" % (paths.bin, ", ".join(name for _, name in INSTALLED_FILES)))
     print("%s: %s (%s)" % (paths.venv, SDK_REQUIREMENT, "exists" if venv_ready(paths) else "create"))
     print("%s: %s" % (paths.config, json.dumps(desired_config(paths, wrapped))))
     print("backups: %s/" % paths.backups)
