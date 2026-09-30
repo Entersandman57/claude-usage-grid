@@ -11,8 +11,8 @@ settings:
     DEVELOPMENT_TEAM: ${DEVELOPMENT_TEAM}
     CODE_SIGN_STYLE: Automatic
     SWIFT_VERSION: "5.0"
-    MARKETING_VERSION: "0.3.0"
-    CURRENT_PROJECT_VERSION: "3"
+    MARKETING_VERSION: "0.3.1"
+    CURRENT_PROJECT_VERSION: "1"  # scripts/build_app.sh stamps each build with a unique number
     ENABLE_HARDENED_RUNTIME: NO
 targets:
   # Menu bar app: reads ~/.claude-usage-grid (so it is not sandboxed), runs the
@@ -27,6 +27,8 @@ targets:
       path: App/Info.plist
       properties:
         CFBundleDisplayName: Claude Usage Grid
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         LSUIElement: true
         LSApplicationCategoryType: public.app-category.developer-tools
         AppGroupID: $(TeamIdentifierPrefix)claudeusagegrid
@@ -56,6 +58,8 @@ targets:
       path: Widget/Info.plist
       properties:
         CFBundleDisplayName: Claude Usage Grid
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         AppGroupID: $(TeamIdentifierPrefix)claudeusagegrid
         NSExtension:
           NSExtensionPointIdentifier: com.apple.widgetkit-extension

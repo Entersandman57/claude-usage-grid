@@ -23,7 +23,7 @@ sys.path.insert(0, HERE)  # installed: common.py sits beside this file
 sys.path.insert(1, os.path.join(os.path.dirname(HERE), "collectors"))  # repo layout
 import common  # noqa: E402
 
-SNAPSHOT_VERSION = 1
+SNAPSHOT_VERSION = 2  # 2: battery sections replaced bars
 CONFIG_NAME = "aggregator-config.json"
 EPSILON = 1e-9
 

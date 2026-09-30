@@ -17,6 +17,14 @@ struct ClaudeUsageGridApp: App {
 }
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
+    private var launchedAsLoginItem = false
+
+    func applicationWillFinishLaunching(_ notification: Notification) {
+        let event = NSAppleEventManager.shared().currentAppleEvent
+        launchedAsLoginItem = event?.eventID == kAEOpenApplication
+            && event?.paramDescriptor(forKeyword: keyAEPropData)?.enumCodeValue == keyAELaunchedAsLogInItem
+    }
+
     func applicationDidFinishLaunching(_ notification: Notification) {
         let arguments = CommandLine.arguments
         if let index = arguments.firstIndex(of: "--render-previews"), index + 1 < arguments.count {
@@ -25,6 +33,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             return
         }
         DataStore.shared.start()
+        // Opened by hand (Finder, Spotlight): show the grid, since the menu bar icon
+        // can be hidden on a crowded menu bar. Not at login, not for scripted
+        // launches (--no-window), and not when a widget link already opened a day.
+        guard !launchedAsLoginItem, !arguments.contains("--no-window") else { return }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            if !WindowManager.shared.hasVisibleWindow { WindowManager.shared.showGrid() }
+        }
+    }
+
+    /// Opening the app again while it runs (Finder, Spotlight, Dock) brings the grid back.
+    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
+        if !WindowManager.shared.hasVisibleWindow { WindowManager.shared.showGrid() }
+        return true
     }
 
     /// claudeusagegrid:// links from the widget (the app is launched first if needed).

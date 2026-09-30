@@ -11,6 +11,10 @@ final class WindowManager {
     private var dayWindow: NSWindow?
     private var dayHost: NSHostingController<DayView>?
 
+    var hasVisibleWindow: Bool {
+        [gridWindow, dayWindow].contains { $0?.isVisible == true }
+    }
+
     func handle(_ url: URL) {
         switch DeepLink.parse(url) {
         case let .day(date): showDay(date)

@@ -31,16 +31,26 @@ if [ "${1:-}" = "test" ]; then
   exit "${PIPESTATUS[0]}"
 fi
 
+# A unique build number per build: macOS only reloads the widget extension and
+# its gallery preview when the version changes.
+BUILD_NUMBER="$(date +%Y%m%d.%H%M%S)"
 xcodebuild build -project ClaudeUsageGrid.xcodeproj -scheme ClaudeUsageGrid -configuration Release \
-  -derivedDataPath "$DERIVED" -allowProvisioningUpdates -quiet DEVELOPMENT_TEAM="$TEAM"
+  -derivedDataPath "$DERIVED" -allowProvisioningUpdates -quiet \
+  DEVELOPMENT_TEAM="$TEAM" CURRENT_PROJECT_VERSION="$BUILD_NUMBER"
 BUILT="$DERIVED/Build/Products/Release/ClaudeUsageGrid.app"
+WIDGET_PROCESS="ClaudeUsageGrid.app/Contents/PlugIns/UsageGridWidget.appex/Contents/MacOS/UsageGridWidget"
 
 # Replace the installed copy, and unregister the build copy so the widget
 # gallery only ever sees the one in /Applications.
 pkill -x ClaudeUsageGrid 2>/dev/null || true
+pkill -f "$WIDGET_PROCESS" 2>/dev/null || true
 rm -rf "$INSTALLED"
 cp -R "$BUILT" "$INSTALLED"
 "$LSREGISTER" -u "$BUILT" 2>/dev/null || true
 "$LSREGISTER" -f "$INSTALLED"
-open "$INSTALLED"
-echo "Installed $INSTALLED (team $TEAM)"
+pluginkit -a "$INSTALLED/Contents/PlugIns/UsageGridWidget.appex"
+# A widget process that is still running keeps the old code in memory; stop it
+# so WidgetKit starts the new build the next time it draws the widget.
+pkill -f "$WIDGET_PROCESS" 2>/dev/null || true
+open "$INSTALLED" --args --no-window
+echo "Installed $INSTALLED build $BUILD_NUMBER (team $TEAM)"

@@ -4,6 +4,19 @@ import WidgetKit
 struct GridEntry: TimelineEntry {
     let date: Date
     let snapshot: Snapshot?
+    var problem: String? = nil
+
+    /// The current snapshot, or why it can't be shown (also written to the system log).
+    static func current() -> GridEntry {
+        switch SnapshotStore.loadResult() {
+        case let .success(snapshot):
+            SnapshotStore.log.info("widget loaded snapshot for \(snapshot.today, privacy: .public), \(snapshot.days.count) days")
+            return GridEntry(date: Date(), snapshot: snapshot)
+        case let .failure(error):
+            SnapshotStore.log.error("widget can't show the grid: \(error.description, privacy: .public)")
+            return GridEntry(date: Date(), snapshot: nil, problem: error.message)
+        }
+    }
 }
 
 /// Reads the snapshot the app wrote to the App Group. The app reloads the
@@ -15,16 +28,14 @@ struct Provider: TimelineProvider {
     }
 
     func getSnapshot(in context: Context, completion: @escaping (GridEntry) -> Void) {
-        let snapshot = context.isPreview ? .placeholder : (SnapshotStore.load() ?? .placeholder)
-        completion(GridEntry(date: Date(), snapshot: snapshot))
+        completion(context.isPreview ? GridEntry(date: Date(), snapshot: .placeholder) : .current())
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<GridEntry>) -> Void) {
         let now = Date()
         let halfHour = now.addingTimeInterval(30 * 60)
         let midnight = Format.calendar.startOfDay(for: now).addingTimeInterval(24 * 3600 + 60)
-        let entry = GridEntry(date: now, snapshot: SnapshotStore.load())
-        completion(Timeline(entries: [entry], policy: .after(min(halfHour, midnight))))
+        completion(Timeline(entries: [.current()], policy: .after(min(halfHour, midnight))))
     }
 }
 
@@ -36,7 +47,8 @@ struct UsageGridEntryView: View {
     var body: some View {
         WidgetContent(snapshot: entry.snapshot,
                       showsHeader: family != .systemMedium,
-                      style: CellStyle(fullColor: renderingMode == .fullColor))
+                      style: CellStyle(fullColor: renderingMode == .fullColor),
+                      message: entry.problem ?? SnapshotStore.LoadError.noFile.message)
             .widgetURL(DeepLink.grid)
     }
 }

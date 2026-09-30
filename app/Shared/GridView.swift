@@ -143,6 +143,8 @@ struct WidgetContent: View {
     var showsHeader: Bool
     var style: CellStyle = .color
     var links = true
+    /// Shown instead of the grid when there is no snapshot.
+    var message = "Open Claude Usage Grid to build your grid."
 
     var body: some View {
         if let snapshot {
@@ -154,7 +156,7 @@ struct WidgetContent: View {
         } else {
             VStack(alignment: .leading, spacing: 4) {
                 Text("Claude Usage Grid").font(.headline)
-                Text("Open the app to build your grid.").font(.caption)
+                Text(message).font(.caption)
             }
             .foregroundStyle(style.text)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
