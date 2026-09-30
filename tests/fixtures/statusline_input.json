@@ -1,0 +1,17 @@
+{
+  "hook_event_name": "Status",
+  "session_id": "07f8a11d-158d-4501-be5e-513ccd2f5af3",
+  "session_name": "usage grid probe",
+  "transcript_path": "/Users/me/.claude/projects/-Users-me-proj/07f8a11d.jsonl",
+  "cwd": "/Users/me/proj/sub",
+  "model": {"id": "claude-opus-5-5", "display_name": "Opus"},
+  "workspace": {"current_dir": "/Users/me/proj/sub", "project_dir": "/Users/me/proj", "added_dirs": []},
+  "version": "2.1.285",
+  "output_style": {"name": "default"},
+  "cost": {"total_cost_usd": 0.01234, "total_duration_ms": 45000},
+  "context_window": {"used_percentage": 8, "remaining_percentage": 92},
+  "rate_limits": {
+    "five_hour": {"used_percentage": 23.5, "resets_at": 1790771400},
+    "seven_day": {"used_percentage": 41.2, "resets_at": 1791162000}
+  }
+}
