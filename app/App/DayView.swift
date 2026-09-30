@@ -19,12 +19,14 @@ struct DayContent: View {
     @ObservedObject var store: DataStore
     let date: String
 
+    private var slots: Int { store.snapshot?.slots ?? 3 }
+
     var body: some View {
         let detail = store.details?.days[date]
         let day = store.snapshot?.days.first { $0.date == date }
         VStack(alignment: .leading, spacing: 20) {
             HStack(spacing: 12) {
-                if let day { DayCell(day: day, size: 34, style: .color) }
+                if let day { DayCell(day: day, size: 34, style: .color, slots: slots) }
                 Text(Format.longDay(date)).font(.title2.weight(.semibold))
             }
             stats(detail: detail, day: day)
@@ -45,7 +47,7 @@ struct DayContent: View {
                      value: known ? Format.percent(usage) : "—",
                      note: known ? "percentage points of the week" : "not tracked yet")
             StatTile(title: "Bars",
-                     value: "\(detail?.bars ?? 0) of 4",
+                     value: "\(detail?.bars ?? 0) of \(slots)",
                      note: known ? "\(Int(((detail?.shareFraction ?? 0) * 100).rounded()))% of a day's share" : "")
             StatTile(title: "Peak 5-hour",
                      value: detail?.peakFiveHourPct.map(Format.percent) ?? "—",
@@ -88,9 +90,14 @@ struct DayContent: View {
                         Text("Claude Code has deleted this transcript (cleanupPeriodDays), so it can't be resumed.")
                             .font(.caption).foregroundStyle(.secondary)
                     } else {
+                        // The desktop app has no documented link to an existing session, and it
+                        // defuses slash commands that arrive in a link. So desktop sessions get
+                        // "Open Claude" (it's in the sidebar under this title); any session can
+                        // be resumed in a terminal via the CLI's documented claude-cli:// link.
                         HStack {
-                            Button("Resume in Claude") {
-                                open(DeepLink.resumeInDesktop(sessionId: session.sessionId, cwd: session.cwd))
+                            if session.entrypoints.contains("claude-desktop") {
+                                Button("Open Claude") { openClaudeApp() }
+                                    .help("Find it in Claude's sidebar under this title.")
                             }
                             Button("Resume in Terminal") {
                                 open(DeepLink.resumeInTerminal(sessionId: session.sessionId, cwd: session.cwd))
@@ -145,6 +152,12 @@ struct DayContent: View {
 
     private func open(_ url: URL) {
         NSWorkspace.shared.open(url)
+    }
+
+    private func openClaudeApp() {
+        guard let app = NSWorkspace.shared.urlForApplication(withBundleIdentifier: "com.anthropic.claudefordesktop")
+        else { return }
+        NSWorkspace.shared.openApplication(at: app, configuration: NSWorkspace.OpenConfiguration())
     }
 }
 

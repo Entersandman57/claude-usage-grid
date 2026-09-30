@@ -127,7 +127,7 @@ def five_hour_by_day(readings):
 
 
 def bars_for(usage_pp, config):
-    """0-4 bars: the day's usage as a fraction of an even daily share of the week."""
+    """0 to len(bar_thresholds) + 1 bars: the day's usage as a fraction of an even daily share of the week."""
     if usage_pp <= EPSILON:
         return 0
     fraction = usage_pp / (100.0 / config["days_per_week"])
@@ -297,6 +297,7 @@ def build(inputs, today, config, generated_at):
     snapshot = {
         "version": SNAPSHOT_VERSION, "generated_at": generated_at, "today": today.isoformat(),
         "week_start": "sunday", "usage_tracked_since": usage_since.isoformat() if usage_since else None,
+        "bar_slots": len(config["bar_thresholds"]) + 1,
         "header": header, "levels": levels, "days": grid,
     }
 

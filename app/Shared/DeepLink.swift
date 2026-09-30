@@ -35,13 +35,6 @@ enum DeepLink {
         value.addingPercentEncoding(withAllowedCharacters: unreserved) ?? ""
     }
 
-    /// Claude desktop: a new Code session in the folder with "/resume <id>" typed, not sent.
-    static func resumeInDesktop(sessionId: String, cwd: String?) -> URL {
-        var query = "q=" + encode("/resume " + sessionId)
-        if let cwd, !cwd.isEmpty { query = "folder=" + encode(cwd) + "&" + query }
-        return URL(string: "claude://code/new?" + query)!
-    }
-
     /// Terminal (the CLI's claude-cli:// handler): opens a terminal with /resume pre-filled.
     static func resumeInTerminal(sessionId: String, cwd: String?) -> URL {
         var query = "q=" + encode("/resume " + sessionId)

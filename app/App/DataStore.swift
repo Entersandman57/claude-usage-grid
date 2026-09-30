@@ -123,6 +123,24 @@ final class DataStore: ObservableObject {
         }
     }
 
+    @Published private(set) var takingReading = false
+
+    /// A manual meter reading (one tiny `claude -p` call). It doesn't use up the
+    /// day's automatic run; the new reading triggers a refresh like any other.
+    func takeReading() {
+        guard !takingReading else { return }
+        takingReading = true
+        let dataDir = self.dataDir
+        Task.detached(priority: .userInitiated) {
+            // A failed call exits non-zero; its reason is in meter-runs and the status list.
+            try? DataStore.run("/usr/bin/python3", [dataDir.appendingPathComponent("bin/meter.py").path, "--now"])
+            await MainActor.run {
+                self.takingReading = false
+                self.refresh()
+            }
+        }
+    }
+
     // MARK: - Running the Python side
 
     nonisolated static func run(_ executable: String, _ arguments: [String]) throws {
@@ -181,7 +199,7 @@ final class DataStore: ObservableObject {
         var parts = [Format.mediumDay(day.date)]
         let detail = details?.days[day.date]
         parts.append(day.usageKnown
-                     ? "\(Format.percent(day.usagePp)) of week (\(day.bars) of 4 bars)"
+                     ? "\(Format.percent(day.usagePp)) of week (\(day.bars) of \(snapshot?.slots ?? 3) bars)"
                      : "usage not tracked yet")
         if let detail, let peak = detail.peakFiveHourPct {
             parts.append("peak 5h \(Format.percent(peak))" + (detail.fiveHourSamples == 1 ? " (1 reading)" : ""))

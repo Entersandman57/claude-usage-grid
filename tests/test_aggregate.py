@@ -119,10 +119,18 @@ def test_dst_spring_forward(new_york):
 
 
 @pytest.mark.parametrize("pp, bars", [
-    (0, 0), (0.01, 1), (DAY_SHARE * 0.25, 1), (DAY_SHARE * 0.2501, 2), (DAY_SHARE * 0.5, 2),
-    (DAY_SHARE * 0.75, 3), (DAY_SHARE * 0.76, 4), (50, 4)])
-def test_bars(pp, bars):
+    (0, 0), (0.01, 1), (DAY_SHARE / 3, 1), (DAY_SHARE * 0.34, 2), (DAY_SHARE * 2 / 3, 2),
+    (DAY_SHARE * 0.67, 3), (DAY_SHARE, 3), (50, 3)])
+def test_three_bars(pp, bars):
     assert aggregate.bars_for(pp, CONFIG) == bars
+
+
+def test_bar_slots_follow_the_config(new_york):
+    snapshot, _ = build(date(2026, 9, 30))
+    assert snapshot["bar_slots"] == 3
+    four = dict(CONFIG, bar_thresholds=[0.25, 0.5, 0.75])
+    snapshot, _ = aggregate.build(inputs(), date(2026, 9, 30), four, generated_at=0)
+    assert snapshot["bar_slots"] == 4 and aggregate.bars_for(50, four) == 4
 
 
 # --- sessions ------------------------------------------------------------------------------

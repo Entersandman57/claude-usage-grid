@@ -94,10 +94,10 @@ final class SharedTests: XCTestCase {
         let id = "762edcb4-6ae2-4cce-a44a-7660148e7ab7"
         XCTAssertEqual(DeepLink.resumeInTerminal(sessionId: id, cwd: "/Users/me/My Project").absoluteString,
                        "claude-cli://open?cwd=%2FUsers%2Fme%2FMy%20Project&q=%2Fresume%20\(id)")
-        XCTAssertEqual(DeepLink.resumeInDesktop(sessionId: id, cwd: "/Users/me/a&b").absoluteString,
-                       "claude://code/new?folder=%2FUsers%2Fme%2Fa%26b&q=%2Fresume%20\(id)")
-        XCTAssertEqual(DeepLink.resumeInDesktop(sessionId: id, cwd: nil).absoluteString,
-                       "claude://code/new?q=%2Fresume%20\(id)")
+        XCTAssertEqual(DeepLink.resumeInTerminal(sessionId: id, cwd: "/Users/me/a&b").absoluteString,
+                       "claude-cli://open?cwd=%2FUsers%2Fme%2Fa%26b&q=%2Fresume%20\(id)")
+        XCTAssertEqual(DeepLink.resumeInTerminal(sessionId: id, cwd: nil).absoluteString,
+                       "claude-cli://open?q=%2Fresume%20\(id)")
     }
 
     func testChatLinks() {

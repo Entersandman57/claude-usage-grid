@@ -78,11 +78,11 @@ Verified on 2026-09-30. You use Claude Code **only in the desktop app's Code tab
    - **How:** launchd wakes the script hourly at :55, which is cheap and makes no `claude` call. The script runs the meter only for today's chosen slot, guarded to once per day. The slot follows `resets_at` automatically, including after DST, when it becomes 20:00 EST if Anthropic keeps it fixed in UTC.
 3. **Peak 5-hour % is mostly a single sample.** With only one reading a day it's the value at reading time, not a true peak. The tooltip will say "5h at last reading" unless several readings exist that day.
 4. **Session counts are unaffected.** Hooks run in desktop (documented; confirmed live in Phase 1), and desktop sessions are in `list_sessions()`.
-5. **Resume opens the desktop app.** The documented routes are `claude://code/new?folder=<cwd>&q=%2Fresume%20<id>` for Code sessions and `claude://claude.ai/chat/<uuid>` for chats.
-   - The new-session route pre-fills `/resume <id>` in a new session. The app always asks you to confirm the folder.
-   - Whether desktop accepts `/resume <id>` with an ID gets tested in Phase 3.
-   - There's no documented route to open an existing Code session by ID, so I won't use the undocumented ones.
-   - "Resume in Terminal" (`claude-cli://`) stays as a secondary button. The VS Code link is dropped.
+5. **Resume: tested in Phase 3, so the desktop gets "Open Claude".** Desktop resume via `claude://code/new?folder=…&q=%2Fresume%20<id>` doesn't work. The desktop app turns a link's leading `/` into a full-width `／`, so slash commands from links never run, and there's no documented route to an existing Code session.
+   - Desktop sessions get **Open Claude**, which brings the app forward so you can find the session in its sidebar by title.
+   - Every session keeps **Resume in Terminal** (`claude-cli://open?cwd=…&q=%2Fresume%20<id>`, from your spec; that handler is registered).
+   - Chats open with `claude://claude.ai/chat/<uuid>` (documented), with https as a fallback.
+   - The VS Code link is dropped.
 
 ## Decisions I made (tell me if you disagree)
 
@@ -100,6 +100,8 @@ Verified on 2026-09-30. You use Claude Code **only in the desktop app's Code tab
 12. **Tall widgets stack bands (Phase 3).** Layout picks the most weeks that fit with cells of at least 14 pt, then the biggest cells that still show them. Medium shows one band of about 17 weeks. Large stacks two bands (about 34 weeks), and extra large shows all 53 weeks in two bands. Each band is GitHub-style, older on top, with today's column at the right edge.
 13. **Signing needs no provisioning profile.** With the free Personal Team, Xcode signs with your Apple Development certificate and embeds no profile, because a Team-ID-prefixed App Group and the sandbox aren't restricted entitlements on macOS. So nothing expires after 7 days; only the certificate does, yearly, and `make app` renews it.
 14. **The widget reloads only when the grid changes.** The app checks the logs' modification times every 15 s and re-runs the aggregator on a change or at midnight. It rewrites the App Group snapshot and calls `reloadAllTimelines()` only if the grid or header differ, which keeps well under WidgetKit's daily reload budget.
+15. **Three bars, not four (your call after Phase 3).** `bar_thresholds` is `[1/3, 2/3]`: 1 bar is up to ⅓ of a day's even share (100% ÷ 7), 2 bars up to ⅔, and 3 bars above. The bar count follows the config: the snapshot carries `bar_slots`, and the widget draws that many slots.
+16. **Manual readings.** The menu's **Take Reading Now** runs `meter.py --now`, one tiny Haiku call. It doesn't use up the day's automatic run; the once-a-day limit only applies to automatic runs.
 
 ## Architecture
 

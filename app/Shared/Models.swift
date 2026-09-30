@@ -9,9 +9,13 @@ struct Snapshot: Codable, Equatable {
     var generatedAt: Double
     var today: String
     var usageTrackedSince: String?
+    var barSlots: Int?
     var header: Header
     var levels: Levels
     var days: [GridDay]
+
+    /// How many battery bars a full cell has (bar_thresholds + 1 in the aggregator config).
+    var slots: Int { max(1, barSlots ?? 3) }
 }
 
 struct Header: Codable, Equatable {

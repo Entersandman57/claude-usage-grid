@@ -9,7 +9,7 @@ struct GridWindowView: View {
         VStack(alignment: .leading, spacing: 14) {
             if let snapshot = store.snapshot {
                 SummaryLine(snapshot: snapshot)
-                GridView(days: snapshot.days,
+                GridView(days: snapshot.days, slots: snapshot.slots,
                          interaction: .interactive(hovered: $hovered,
                                                    open: { WindowManager.shared.showDay($0) },
                                                    tooltip: store.tooltip(for:)),
@@ -18,7 +18,7 @@ struct GridWindowView: View {
                 Text(hoverText(snapshot))
                     .font(.callout)
                     .foregroundStyle(hovered == nil ? .secondary : .primary)
-                LegendView()
+                LegendView(slots: snapshot.slots)
                 Divider()
                 VStack(alignment: .leading, spacing: 3) {
                     ForEach(store.statusLines, id: \.self) { Text($0) }
@@ -43,9 +43,11 @@ struct GridWindowView: View {
 }
 
 struct LegendView: View {
+    let slots: Int
+
     private func sample(level: Int, bars: Int) -> some View {
         DayCell(day: GridDay(date: "", usagePp: 0, bars: bars, sessions: 0, level: level, usageKnown: true),
-                size: 14, style: .color)
+                size: 14, style: .color, slots: slots)
     }
 
     var body: some View {
@@ -57,8 +59,8 @@ struct LegendView: View {
             }
             HStack(spacing: 4) {
                 Text("Weekly limit used that day")
-                ForEach(1..<5, id: \.self) { sample(level: 3, bars: $0) }
-                Text("1 bar ≤ ¼ of a day's even share (100% ÷ 7), 4 bars > ¾")
+                ForEach(1...slots, id: \.self) { sample(level: 3, bars: $0) }
+                Text("each bar is 1/\(slots) of a day's even share (100% ÷ 7); \(slots) bars = more than \(slots - 1)/\(slots)")
             }
         }
         .font(.caption)

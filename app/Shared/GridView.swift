@@ -1,17 +1,18 @@
 import SwiftUI
 
-/// A day square: orange by session level, with four Nokia-style battery bars
-/// that fill bottom-up with the share of the weekly limit used that day.
+/// A day square: orange by session level, with Nokia-style battery bars that
+/// fill bottom-up with the share of the weekly limit used that day.
 struct DayCell: View {
     let day: GridDay
     let size: CGFloat
     let style: CellStyle
+    var slots = 3
 
     var body: some View {
         RoundedRectangle(cornerRadius: size * 0.2, style: .continuous)
             .fill(style.fill(level: day.level))
             .overlay {
-                if day.bars > 0 { BatteryBars(filled: day.bars, size: size, style: style) }
+                if day.bars > 0 { BatteryBars(filled: day.bars, slots: slots, size: size, style: style) }
             }
             .frame(width: size, height: size)
     }
@@ -19,25 +20,28 @@ struct DayCell: View {
 
 struct BatteryBars: View {
     let filled: Int
+    let slots: Int
     let size: CGFloat
     let style: CellStyle
 
-    // Like the old Nokia battery indicator, bars get longer toward the top.
-    private static let widths: [CGFloat] = [0.55, 0.7, 0.85, 1.0]
-
     var body: some View {
         let inset = max(2, (size * 0.17).rounded())
-        let spacing = max(1, (size * 0.07).rounded())
+        let spacing = max(1, (size * 0.08).rounded())
         let inner = size - 2 * inset
-        let barHeight = (inner - 3 * spacing) / 4
+        let barHeight = (inner - CGFloat(slots - 1) * spacing) / CGFloat(slots)
         VStack(spacing: spacing) {
-            ForEach((0..<4).reversed(), id: \.self) { index in
+            ForEach((0..<slots).reversed(), id: \.self) { index in
                 RoundedRectangle(cornerRadius: min(1, barHeight / 2))
                     .fill(index < filled ? style.barFill : style.barSlot)
-                    .frame(width: inner * Self.widths[index], height: barHeight)
+                    .frame(width: inner * width(of: index), height: barHeight)
             }
         }
         .frame(width: inner, height: inner)
+    }
+
+    /// Like the old Nokia battery indicator, bars get longer toward the top.
+    private func width(of index: Int) -> CGFloat {
+        slots == 1 ? 1 : 0.55 + 0.45 * CGFloat(index) / CGFloat(slots - 1)
     }
 }
 
@@ -54,6 +58,7 @@ enum GridInteraction {
 /// labels on top, Mon/Wed/Fri on the left. Fills whatever size it is given.
 struct GridView: View {
     let days: [GridDay]
+    var slots = 3
     var style: CellStyle = .color
     var interaction: GridInteraction = .none
     var maxBands = 3
@@ -110,7 +115,7 @@ struct GridView: View {
     @ViewBuilder
     private func cellView(_ day: GridDay?, size: CGFloat) -> some View {
         if let day {
-            let cell = DayCell(day: day, size: size, style: style)
+            let cell = DayCell(day: day, size: size, style: style, slots: slots)
             switch interaction {
             case .none:
                 cell
@@ -174,7 +179,7 @@ struct WidgetContent: View {
         if let snapshot {
             VStack(alignment: .leading, spacing: 6) {
                 if showsHeader { SummaryLine(snapshot: snapshot, style: style) }
-                GridView(days: snapshot.days, style: style, interaction: links ? .links : .none)
+                GridView(days: snapshot.days, slots: snapshot.slots, style: style, interaction: links ? .links : .none)
             }
         } else {
             VStack(alignment: .leading, spacing: 4) {
@@ -200,13 +205,13 @@ extension Snapshot {
             seed = seed &* 1_103_515_245 &+ 12_345
             let roll = Int((seed >> 16) % 100)
             let sessions = roll < 35 ? 0 : roll % 9
-            let bars = sessions == 0 ? 0 : 1 + roll % 4
+            let bars = sessions == 0 ? 0 : 1 + roll % 3
             let date = calendar.date(byAdding: .day, value: offset, to: start)!
             days.append(GridDay(date: Format.iso(date), usagePp: Double(bars) * 3, bars: bars,
                                 sessions: sessions, level: min(4, (sessions + 1) / 2), usageKnown: true))
         }
         return Snapshot(version: 1, generatedAt: today.timeIntervalSince1970, today: Format.iso(today),
-                        usageTrackedSince: days.first?.date,
+                        usageTrackedSince: days.first?.date, barSlots: 3,
                         header: Header(week: UsageWindow(usedPct: 42, resetsAt: nil, asOf: 0, source: nil),
                                        fiveHour: UsageWindow(usedPct: 18, resetsAt: nil, asOf: 0, source: nil),
                                        todayUsagePp: 6, todaySessions: 3),

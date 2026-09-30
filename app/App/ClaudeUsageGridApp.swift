@@ -45,6 +45,8 @@ struct MenuContent: View {
             .keyboardShortcut("t")
         Button("Refresh Now") { store.refresh() }
             .keyboardShortcut("r")
+        Button(store.takingReading ? "Taking Reading…" : "Take Reading Now") { store.takeReading() }
+            .disabled(store.takingReading)
         Divider()
         ForEach(store.statusLines, id: \.self) { Text($0) }
         Divider()
