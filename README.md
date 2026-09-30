@@ -12,7 +12,7 @@ Columns are weeks (oldest on the left, this week on the right), rows run Sunday 
 
 | The day's usage, as f = usage ÷ 14.29% | The square |
 |---|---|
-| Before the first usage reading ever recorded | plain dark square, no dividers (no data yet) |
+| Before the first usage reading ever recorded | dark battery: 3 sections in `#24262b`, a shade darker than an empty one (no data yet) |
 | f = 0 | empty battery: 3 unfilled sections |
 | 0 < f ≤ ⅓ | 1 section filled |
 | ⅓ < f ≤ ⅔ | 2 sections filled |

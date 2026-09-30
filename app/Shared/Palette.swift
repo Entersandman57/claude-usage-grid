@@ -13,7 +13,7 @@ extension Color {
 /// The grid's fixed dark palette.
 enum Palette {
     static let background = Color(hex: 0x17181c)  // also shows through the section dividers
-    static let noData = Color(hex: 0x24262b)      // a day before tracking started
+    static let noData = Color(hex: 0x24262b)      // sections of a day before tracking started
     static let unfilled = Color(hex: 0x2e3037)    // an unfilled battery section
     static let surface = Color(hex: 0x24262b)     // cards in the app's windows
     /// Session levels 1-4: fewer sessions are a light, whitish orange, more are deep and vivid.
@@ -25,8 +25,8 @@ enum Palette {
 /// Full color uses the palette. When macOS drains a desktop widget's color
 /// (another window in front, or a monochrome or tinted widget style), hue is
 /// lost, so brightness carries the meaning: filled sections are clearly
-/// brighter than unfilled ones and get brighter with the session level, and a
-/// no-data square is the dimmest. In the tinted style, filled sections take
+/// brighter than unfilled ones and get brighter with the session level, and
+/// no-data sections are the dimmest. In the tinted style, filled sections take
 /// the tint.
 struct CellStyle: Equatable {
     var fullColor: Bool
@@ -72,8 +72,9 @@ enum CellGeometry {
 
 /// A day square drawn as a battery: `sectionCount` full-width sections split by
 /// thin gaps, filled bottom-up with the day's share of the weekly limit, in the
-/// day's session-level orange. A day before tracking started is a plain empty
-/// square with no dividers, so "no data" looks different from "zero usage".
+/// day's session-level orange. Every day shows the dividers. A day before
+/// tracking started uses the darker no-data color for all its sections, so it
+/// still reads differently from a tracked day with zero usage.
 struct DayCell: View {
     let day: GridDay
     let size: CGFloat
@@ -81,24 +82,19 @@ struct DayCell: View {
     var sectionCount = 3
 
     var body: some View {
-        let shape = RoundedRectangle(cornerRadius: size * 0.2, style: .continuous)
-        Group {
-            if day.usageKnown {
-                VStack(spacing: CellGeometry.divider) {
-                    ForEach((0..<sectionCount).reversed(), id: \.self) { index in
-                        if index < day.sections {
-                            Rectangle().fill(style.filled(level: day.level)).widgetAccentable()
-                        } else {
-                            Rectangle().fill(style.unfilled)
-                        }
-                    }
-                    .frame(height: CellGeometry.sectionHeight(size: size, count: sectionCount))
+        VStack(spacing: CellGeometry.divider) {
+            ForEach((0..<sectionCount).reversed(), id: \.self) { index in
+                if !day.usageKnown {
+                    Rectangle().fill(style.noData)
+                } else if index < day.sections {
+                    Rectangle().fill(style.filled(level: day.level)).widgetAccentable()
+                } else {
+                    Rectangle().fill(style.unfilled)
                 }
-                .clipShape(shape)  // only the square's outer corners are rounded
-            } else {
-                shape.fill(style.noData)
             }
+            .frame(height: CellGeometry.sectionHeight(size: size, count: sectionCount))
         }
         .frame(width: size, height: size)
+        .clipShape(RoundedRectangle(cornerRadius: size * 0.2, style: .continuous))  // only the outer corners
     }
 }

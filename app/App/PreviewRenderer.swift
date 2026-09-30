@@ -42,7 +42,7 @@ enum PreviewRenderer {
         for fullColor in [true, false] {
             let style = CellStyle(fullColor: fullColor)
             let sheet = VStack(alignment: .leading, spacing: 24) {
-                CellKey(size: 40, style: style)
+                CellKey(size: 41, style: style)  // a crisp size: 13 pt sections
                 CellKey(size: 14, style: style)
             }
             .padding(16)

@@ -275,8 +275,8 @@ def build(inputs, today, config, generated_at):
         detail["level"] = level_for(detail["sessions"], thresholds)
 
     # Days before the first weekly reading ever recorded have no usage data: the
-    # grid draws them as a plain empty square, unlike a tracked day with 0 usage
-    # (an empty battery).
+    # grid draws them as a battery in the darker no-data color, unlike a tracked
+    # day with 0 usage (an empty battery).
     first_reading = next((r["ts"] for r in readings if common.normalize_window(r.get("seven_day"))), None)
     usage_since = day_of(first_reading) if first_reading is not None else None
     grid_start = sunday_on_or_before(today) - timedelta(weeks=config["grid_weeks"] - 1)
