@@ -1,0 +1,6 @@
+{
+  "statusLine": {
+    "type": "command",
+    "command": "/usr/bin/python3 /Users/petesmacintosh/code/Sidework/claude-usage-grid/verify/statusline_probe.py"
+  }
+}

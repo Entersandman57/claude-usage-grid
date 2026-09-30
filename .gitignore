@@ -1,0 +1,9 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+verify/out/
+build/
+DerivedData/
+*.xcodeproj/
+.DS_Store
