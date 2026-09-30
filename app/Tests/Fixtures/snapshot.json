@@ -4,6 +4,7 @@
   "today": "2026-09-30",
   "week_start": "sunday",
   "usage_tracked_since": "2026-09-28",
+  "section_count": 3,
   "header": {
     "week": {
       "used_pct": 12,
@@ -33,7 +34,7 @@
     {
       "date": "2025-09-28",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -41,7 +42,7 @@
     {
       "date": "2025-09-29",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -49,7 +50,7 @@
     {
       "date": "2025-09-30",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -57,7 +58,7 @@
     {
       "date": "2025-10-01",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -65,7 +66,7 @@
     {
       "date": "2025-10-02",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -73,7 +74,7 @@
     {
       "date": "2025-10-03",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -81,7 +82,7 @@
     {
       "date": "2025-10-04",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -89,7 +90,7 @@
     {
       "date": "2025-10-05",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -97,7 +98,7 @@
     {
       "date": "2025-10-06",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -105,7 +106,7 @@
     {
       "date": "2025-10-07",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -113,7 +114,7 @@
     {
       "date": "2025-10-08",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -121,7 +122,7 @@
     {
       "date": "2025-10-09",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -129,7 +130,7 @@
     {
       "date": "2025-10-10",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -137,7 +138,7 @@
     {
       "date": "2025-10-11",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -145,7 +146,7 @@
     {
       "date": "2025-10-12",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -153,7 +154,7 @@
     {
       "date": "2025-10-13",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -161,7 +162,7 @@
     {
       "date": "2025-10-14",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -169,7 +170,7 @@
     {
       "date": "2025-10-15",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -177,7 +178,7 @@
     {
       "date": "2025-10-16",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -185,7 +186,7 @@
     {
       "date": "2025-10-17",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -193,7 +194,7 @@
     {
       "date": "2025-10-18",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -201,7 +202,7 @@
     {
       "date": "2025-10-19",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -209,7 +210,7 @@
     {
       "date": "2025-10-20",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -217,7 +218,7 @@
     {
       "date": "2025-10-21",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -225,7 +226,7 @@
     {
       "date": "2025-10-22",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -233,7 +234,7 @@
     {
       "date": "2025-10-23",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -241,7 +242,7 @@
     {
       "date": "2025-10-24",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -249,7 +250,7 @@
     {
       "date": "2025-10-25",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -257,7 +258,7 @@
     {
       "date": "2025-10-26",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -265,7 +266,7 @@
     {
       "date": "2025-10-27",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -273,7 +274,7 @@
     {
       "date": "2025-10-28",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -281,7 +282,7 @@
     {
       "date": "2025-10-29",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -289,7 +290,7 @@
     {
       "date": "2025-10-30",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -297,7 +298,7 @@
     {
       "date": "2025-10-31",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -305,7 +306,7 @@
     {
       "date": "2025-11-01",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -313,7 +314,7 @@
     {
       "date": "2025-11-02",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -321,7 +322,7 @@
     {
       "date": "2025-11-03",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -329,7 +330,7 @@
     {
       "date": "2025-11-04",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -337,7 +338,7 @@
     {
       "date": "2025-11-05",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -345,7 +346,7 @@
     {
       "date": "2025-11-06",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -353,7 +354,7 @@
     {
       "date": "2025-11-07",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -361,7 +362,7 @@
     {
       "date": "2025-11-08",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -369,7 +370,7 @@
     {
       "date": "2025-11-09",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -377,7 +378,7 @@
     {
       "date": "2025-11-10",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -385,7 +386,7 @@
     {
       "date": "2025-11-11",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -393,7 +394,7 @@
     {
       "date": "2025-11-12",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -401,7 +402,7 @@
     {
       "date": "2025-11-13",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -409,7 +410,7 @@
     {
       "date": "2025-11-14",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -417,7 +418,7 @@
     {
       "date": "2025-11-15",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -425,7 +426,7 @@
     {
       "date": "2025-11-16",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -433,7 +434,7 @@
     {
       "date": "2025-11-17",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -441,7 +442,7 @@
     {
       "date": "2025-11-18",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -449,7 +450,7 @@
     {
       "date": "2025-11-19",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -457,7 +458,7 @@
     {
       "date": "2025-11-20",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -465,7 +466,7 @@
     {
       "date": "2025-11-21",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -473,7 +474,7 @@
     {
       "date": "2025-11-22",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -481,7 +482,7 @@
     {
       "date": "2025-11-23",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -489,7 +490,7 @@
     {
       "date": "2025-11-24",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -497,7 +498,7 @@
     {
       "date": "2025-11-25",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -505,7 +506,7 @@
     {
       "date": "2025-11-26",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -513,7 +514,7 @@
     {
       "date": "2025-11-27",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -521,7 +522,7 @@
     {
       "date": "2025-11-28",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -529,7 +530,7 @@
     {
       "date": "2025-11-29",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -537,7 +538,7 @@
     {
       "date": "2025-11-30",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -545,7 +546,7 @@
     {
       "date": "2025-12-01",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -553,7 +554,7 @@
     {
       "date": "2025-12-02",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -561,7 +562,7 @@
     {
       "date": "2025-12-03",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -569,7 +570,7 @@
     {
       "date": "2025-12-04",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -577,7 +578,7 @@
     {
       "date": "2025-12-05",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -585,7 +586,7 @@
     {
       "date": "2025-12-06",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -593,7 +594,7 @@
     {
       "date": "2025-12-07",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -601,7 +602,7 @@
     {
       "date": "2025-12-08",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -609,7 +610,7 @@
     {
       "date": "2025-12-09",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -617,7 +618,7 @@
     {
       "date": "2025-12-10",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -625,7 +626,7 @@
     {
       "date": "2025-12-11",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -633,7 +634,7 @@
     {
       "date": "2025-12-12",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -641,7 +642,7 @@
     {
       "date": "2025-12-13",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -649,7 +650,7 @@
     {
       "date": "2025-12-14",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -657,7 +658,7 @@
     {
       "date": "2025-12-15",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -665,7 +666,7 @@
     {
       "date": "2025-12-16",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -673,7 +674,7 @@
     {
       "date": "2025-12-17",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -681,7 +682,7 @@
     {
       "date": "2025-12-18",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -689,7 +690,7 @@
     {
       "date": "2025-12-19",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -697,7 +698,7 @@
     {
       "date": "2025-12-20",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -705,7 +706,7 @@
     {
       "date": "2025-12-21",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -713,7 +714,7 @@
     {
       "date": "2025-12-22",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -721,7 +722,7 @@
     {
       "date": "2025-12-23",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -729,7 +730,7 @@
     {
       "date": "2025-12-24",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -737,7 +738,7 @@
     {
       "date": "2025-12-25",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -745,7 +746,7 @@
     {
       "date": "2025-12-26",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -753,7 +754,7 @@
     {
       "date": "2025-12-27",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -761,7 +762,7 @@
     {
       "date": "2025-12-28",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -769,7 +770,7 @@
     {
       "date": "2025-12-29",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -777,7 +778,7 @@
     {
       "date": "2025-12-30",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -785,7 +786,7 @@
     {
       "date": "2025-12-31",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -793,7 +794,7 @@
     {
       "date": "2026-01-01",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -801,7 +802,7 @@
     {
       "date": "2026-01-02",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -809,7 +810,7 @@
     {
       "date": "2026-01-03",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -817,7 +818,7 @@
     {
       "date": "2026-01-04",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -825,7 +826,7 @@
     {
       "date": "2026-01-05",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -833,7 +834,7 @@
     {
       "date": "2026-01-06",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -841,7 +842,7 @@
     {
       "date": "2026-01-07",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -849,7 +850,7 @@
     {
       "date": "2026-01-08",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -857,7 +858,7 @@
     {
       "date": "2026-01-09",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -865,7 +866,7 @@
     {
       "date": "2026-01-10",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -873,7 +874,7 @@
     {
       "date": "2026-01-11",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -881,7 +882,7 @@
     {
       "date": "2026-01-12",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -889,7 +890,7 @@
     {
       "date": "2026-01-13",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -897,7 +898,7 @@
     {
       "date": "2026-01-14",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -905,7 +906,7 @@
     {
       "date": "2026-01-15",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -913,7 +914,7 @@
     {
       "date": "2026-01-16",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -921,7 +922,7 @@
     {
       "date": "2026-01-17",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -929,7 +930,7 @@
     {
       "date": "2026-01-18",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -937,7 +938,7 @@
     {
       "date": "2026-01-19",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -945,7 +946,7 @@
     {
       "date": "2026-01-20",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -953,7 +954,7 @@
     {
       "date": "2026-01-21",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -961,7 +962,7 @@
     {
       "date": "2026-01-22",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -969,7 +970,7 @@
     {
       "date": "2026-01-23",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -977,7 +978,7 @@
     {
       "date": "2026-01-24",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -985,7 +986,7 @@
     {
       "date": "2026-01-25",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -993,7 +994,7 @@
     {
       "date": "2026-01-26",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1001,7 +1002,7 @@
     {
       "date": "2026-01-27",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1009,7 +1010,7 @@
     {
       "date": "2026-01-28",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1017,7 +1018,7 @@
     {
       "date": "2026-01-29",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1025,7 +1026,7 @@
     {
       "date": "2026-01-30",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1033,7 +1034,7 @@
     {
       "date": "2026-01-31",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1041,7 +1042,7 @@
     {
       "date": "2026-02-01",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1049,7 +1050,7 @@
     {
       "date": "2026-02-02",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1057,7 +1058,7 @@
     {
       "date": "2026-02-03",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1065,7 +1066,7 @@
     {
       "date": "2026-02-04",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1073,7 +1074,7 @@
     {
       "date": "2026-02-05",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1081,7 +1082,7 @@
     {
       "date": "2026-02-06",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1089,7 +1090,7 @@
     {
       "date": "2026-02-07",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1097,7 +1098,7 @@
     {
       "date": "2026-02-08",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1105,7 +1106,7 @@
     {
       "date": "2026-02-09",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1113,7 +1114,7 @@
     {
       "date": "2026-02-10",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1121,7 +1122,7 @@
     {
       "date": "2026-02-11",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1129,7 +1130,7 @@
     {
       "date": "2026-02-12",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1137,7 +1138,7 @@
     {
       "date": "2026-02-13",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1145,7 +1146,7 @@
     {
       "date": "2026-02-14",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1153,7 +1154,7 @@
     {
       "date": "2026-02-15",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1161,7 +1162,7 @@
     {
       "date": "2026-02-16",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1169,7 +1170,7 @@
     {
       "date": "2026-02-17",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1177,7 +1178,7 @@
     {
       "date": "2026-02-18",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1185,7 +1186,7 @@
     {
       "date": "2026-02-19",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1193,7 +1194,7 @@
     {
       "date": "2026-02-20",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1201,7 +1202,7 @@
     {
       "date": "2026-02-21",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1209,7 +1210,7 @@
     {
       "date": "2026-02-22",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1217,7 +1218,7 @@
     {
       "date": "2026-02-23",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1225,7 +1226,7 @@
     {
       "date": "2026-02-24",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1233,7 +1234,7 @@
     {
       "date": "2026-02-25",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1241,7 +1242,7 @@
     {
       "date": "2026-02-26",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1249,7 +1250,7 @@
     {
       "date": "2026-02-27",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1257,7 +1258,7 @@
     {
       "date": "2026-02-28",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1265,7 +1266,7 @@
     {
       "date": "2026-03-01",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1273,7 +1274,7 @@
     {
       "date": "2026-03-02",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1281,7 +1282,7 @@
     {
       "date": "2026-03-03",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1289,7 +1290,7 @@
     {
       "date": "2026-03-04",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1297,7 +1298,7 @@
     {
       "date": "2026-03-05",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1305,7 +1306,7 @@
     {
       "date": "2026-03-06",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1313,7 +1314,7 @@
     {
       "date": "2026-03-07",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1321,7 +1322,7 @@
     {
       "date": "2026-03-08",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1329,7 +1330,7 @@
     {
       "date": "2026-03-09",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1337,7 +1338,7 @@
     {
       "date": "2026-03-10",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1345,7 +1346,7 @@
     {
       "date": "2026-03-11",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1353,7 +1354,7 @@
     {
       "date": "2026-03-12",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1361,7 +1362,7 @@
     {
       "date": "2026-03-13",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1369,7 +1370,7 @@
     {
       "date": "2026-03-14",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1377,7 +1378,7 @@
     {
       "date": "2026-03-15",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1385,7 +1386,7 @@
     {
       "date": "2026-03-16",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1393,7 +1394,7 @@
     {
       "date": "2026-03-17",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1401,7 +1402,7 @@
     {
       "date": "2026-03-18",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1409,7 +1410,7 @@
     {
       "date": "2026-03-19",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1417,7 +1418,7 @@
     {
       "date": "2026-03-20",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1425,7 +1426,7 @@
     {
       "date": "2026-03-21",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1433,7 +1434,7 @@
     {
       "date": "2026-03-22",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1441,7 +1442,7 @@
     {
       "date": "2026-03-23",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1449,7 +1450,7 @@
     {
       "date": "2026-03-24",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1457,7 +1458,7 @@
     {
       "date": "2026-03-25",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1465,7 +1466,7 @@
     {
       "date": "2026-03-26",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1473,7 +1474,7 @@
     {
       "date": "2026-03-27",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1481,7 +1482,7 @@
     {
       "date": "2026-03-28",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1489,7 +1490,7 @@
     {
       "date": "2026-03-29",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1497,7 +1498,7 @@
     {
       "date": "2026-03-30",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1505,7 +1506,7 @@
     {
       "date": "2026-03-31",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1513,7 +1514,7 @@
     {
       "date": "2026-04-01",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1521,7 +1522,7 @@
     {
       "date": "2026-04-02",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1529,7 +1530,7 @@
     {
       "date": "2026-04-03",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1537,7 +1538,7 @@
     {
       "date": "2026-04-04",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1545,7 +1546,7 @@
     {
       "date": "2026-04-05",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1553,7 +1554,7 @@
     {
       "date": "2026-04-06",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1561,7 +1562,7 @@
     {
       "date": "2026-04-07",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1569,7 +1570,7 @@
     {
       "date": "2026-04-08",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1577,7 +1578,7 @@
     {
       "date": "2026-04-09",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1585,7 +1586,7 @@
     {
       "date": "2026-04-10",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1593,7 +1594,7 @@
     {
       "date": "2026-04-11",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1601,7 +1602,7 @@
     {
       "date": "2026-04-12",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1609,7 +1610,7 @@
     {
       "date": "2026-04-13",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1617,7 +1618,7 @@
     {
       "date": "2026-04-14",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1625,7 +1626,7 @@
     {
       "date": "2026-04-15",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1633,7 +1634,7 @@
     {
       "date": "2026-04-16",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1641,7 +1642,7 @@
     {
       "date": "2026-04-17",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1649,7 +1650,7 @@
     {
       "date": "2026-04-18",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1657,7 +1658,7 @@
     {
       "date": "2026-04-19",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1665,7 +1666,7 @@
     {
       "date": "2026-04-20",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1673,7 +1674,7 @@
     {
       "date": "2026-04-21",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1681,7 +1682,7 @@
     {
       "date": "2026-04-22",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1689,7 +1690,7 @@
     {
       "date": "2026-04-23",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1697,7 +1698,7 @@
     {
       "date": "2026-04-24",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1705,7 +1706,7 @@
     {
       "date": "2026-04-25",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1713,7 +1714,7 @@
     {
       "date": "2026-04-26",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1721,7 +1722,7 @@
     {
       "date": "2026-04-27",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1729,7 +1730,7 @@
     {
       "date": "2026-04-28",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1737,7 +1738,7 @@
     {
       "date": "2026-04-29",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1745,7 +1746,7 @@
     {
       "date": "2026-04-30",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1753,7 +1754,7 @@
     {
       "date": "2026-05-01",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1761,7 +1762,7 @@
     {
       "date": "2026-05-02",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1769,7 +1770,7 @@
     {
       "date": "2026-05-03",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1777,7 +1778,7 @@
     {
       "date": "2026-05-04",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1785,7 +1786,7 @@
     {
       "date": "2026-05-05",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1793,7 +1794,7 @@
     {
       "date": "2026-05-06",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1801,7 +1802,7 @@
     {
       "date": "2026-05-07",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1809,7 +1810,7 @@
     {
       "date": "2026-05-08",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1817,7 +1818,7 @@
     {
       "date": "2026-05-09",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1825,7 +1826,7 @@
     {
       "date": "2026-05-10",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1833,7 +1834,7 @@
     {
       "date": "2026-05-11",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1841,7 +1842,7 @@
     {
       "date": "2026-05-12",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1849,7 +1850,7 @@
     {
       "date": "2026-05-13",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1857,7 +1858,7 @@
     {
       "date": "2026-05-14",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1865,7 +1866,7 @@
     {
       "date": "2026-05-15",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1873,7 +1874,7 @@
     {
       "date": "2026-05-16",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1881,7 +1882,7 @@
     {
       "date": "2026-05-17",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1889,7 +1890,7 @@
     {
       "date": "2026-05-18",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1897,7 +1898,7 @@
     {
       "date": "2026-05-19",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1905,7 +1906,7 @@
     {
       "date": "2026-05-20",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1913,7 +1914,7 @@
     {
       "date": "2026-05-21",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1921,7 +1922,7 @@
     {
       "date": "2026-05-22",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1929,7 +1930,7 @@
     {
       "date": "2026-05-23",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1937,7 +1938,7 @@
     {
       "date": "2026-05-24",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1945,7 +1946,7 @@
     {
       "date": "2026-05-25",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1953,7 +1954,7 @@
     {
       "date": "2026-05-26",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1961,7 +1962,7 @@
     {
       "date": "2026-05-27",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1969,7 +1970,7 @@
     {
       "date": "2026-05-28",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1977,7 +1978,7 @@
     {
       "date": "2026-05-29",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1985,7 +1986,7 @@
     {
       "date": "2026-05-30",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -1993,7 +1994,7 @@
     {
       "date": "2026-05-31",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2001,7 +2002,7 @@
     {
       "date": "2026-06-01",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2009,7 +2010,7 @@
     {
       "date": "2026-06-02",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2017,7 +2018,7 @@
     {
       "date": "2026-06-03",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2025,7 +2026,7 @@
     {
       "date": "2026-06-04",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2033,7 +2034,7 @@
     {
       "date": "2026-06-05",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2041,7 +2042,7 @@
     {
       "date": "2026-06-06",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2049,7 +2050,7 @@
     {
       "date": "2026-06-07",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2057,7 +2058,7 @@
     {
       "date": "2026-06-08",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2065,7 +2066,7 @@
     {
       "date": "2026-06-09",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2073,7 +2074,7 @@
     {
       "date": "2026-06-10",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2081,7 +2082,7 @@
     {
       "date": "2026-06-11",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2089,7 +2090,7 @@
     {
       "date": "2026-06-12",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2097,7 +2098,7 @@
     {
       "date": "2026-06-13",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2105,7 +2106,7 @@
     {
       "date": "2026-06-14",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2113,7 +2114,7 @@
     {
       "date": "2026-06-15",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2121,7 +2122,7 @@
     {
       "date": "2026-06-16",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2129,7 +2130,7 @@
     {
       "date": "2026-06-17",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2137,7 +2138,7 @@
     {
       "date": "2026-06-18",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2145,7 +2146,7 @@
     {
       "date": "2026-06-19",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2153,7 +2154,7 @@
     {
       "date": "2026-06-20",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2161,7 +2162,7 @@
     {
       "date": "2026-06-21",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2169,7 +2170,7 @@
     {
       "date": "2026-06-22",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2177,7 +2178,7 @@
     {
       "date": "2026-06-23",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2185,7 +2186,7 @@
     {
       "date": "2026-06-24",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2193,7 +2194,7 @@
     {
       "date": "2026-06-25",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2201,7 +2202,7 @@
     {
       "date": "2026-06-26",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2209,7 +2210,7 @@
     {
       "date": "2026-06-27",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2217,7 +2218,7 @@
     {
       "date": "2026-06-28",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2225,7 +2226,7 @@
     {
       "date": "2026-06-29",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2233,7 +2234,7 @@
     {
       "date": "2026-06-30",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2241,7 +2242,7 @@
     {
       "date": "2026-07-01",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2249,7 +2250,7 @@
     {
       "date": "2026-07-02",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2257,7 +2258,7 @@
     {
       "date": "2026-07-03",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2265,7 +2266,7 @@
     {
       "date": "2026-07-04",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2273,7 +2274,7 @@
     {
       "date": "2026-07-05",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2281,7 +2282,7 @@
     {
       "date": "2026-07-06",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2289,7 +2290,7 @@
     {
       "date": "2026-07-07",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2297,7 +2298,7 @@
     {
       "date": "2026-07-08",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2305,7 +2306,7 @@
     {
       "date": "2026-07-09",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2313,7 +2314,7 @@
     {
       "date": "2026-07-10",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2321,7 +2322,7 @@
     {
       "date": "2026-07-11",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2329,7 +2330,7 @@
     {
       "date": "2026-07-12",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2337,7 +2338,7 @@
     {
       "date": "2026-07-13",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2345,7 +2346,7 @@
     {
       "date": "2026-07-14",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2353,7 +2354,7 @@
     {
       "date": "2026-07-15",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2361,7 +2362,7 @@
     {
       "date": "2026-07-16",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2369,7 +2370,7 @@
     {
       "date": "2026-07-17",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2377,7 +2378,7 @@
     {
       "date": "2026-07-18",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2385,7 +2386,7 @@
     {
       "date": "2026-07-19",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2393,7 +2394,7 @@
     {
       "date": "2026-07-20",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2401,7 +2402,7 @@
     {
       "date": "2026-07-21",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2409,7 +2410,7 @@
     {
       "date": "2026-07-22",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2417,7 +2418,7 @@
     {
       "date": "2026-07-23",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2425,7 +2426,7 @@
     {
       "date": "2026-07-24",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2433,7 +2434,7 @@
     {
       "date": "2026-07-25",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2441,7 +2442,7 @@
     {
       "date": "2026-07-26",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2449,7 +2450,7 @@
     {
       "date": "2026-07-27",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2457,7 +2458,7 @@
     {
       "date": "2026-07-28",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2465,7 +2466,7 @@
     {
       "date": "2026-07-29",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2473,7 +2474,7 @@
     {
       "date": "2026-07-30",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2481,7 +2482,7 @@
     {
       "date": "2026-07-31",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2489,7 +2490,7 @@
     {
       "date": "2026-08-01",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2497,7 +2498,7 @@
     {
       "date": "2026-08-02",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2505,7 +2506,7 @@
     {
       "date": "2026-08-03",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2513,7 +2514,7 @@
     {
       "date": "2026-08-04",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2521,7 +2522,7 @@
     {
       "date": "2026-08-05",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2529,7 +2530,7 @@
     {
       "date": "2026-08-06",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2537,7 +2538,7 @@
     {
       "date": "2026-08-07",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2545,7 +2546,7 @@
     {
       "date": "2026-08-08",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2553,7 +2554,7 @@
     {
       "date": "2026-08-09",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2561,7 +2562,7 @@
     {
       "date": "2026-08-10",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2569,7 +2570,7 @@
     {
       "date": "2026-08-11",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2577,7 +2578,7 @@
     {
       "date": "2026-08-12",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2585,7 +2586,7 @@
     {
       "date": "2026-08-13",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2593,7 +2594,7 @@
     {
       "date": "2026-08-14",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2601,7 +2602,7 @@
     {
       "date": "2026-08-15",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2609,7 +2610,7 @@
     {
       "date": "2026-08-16",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2617,7 +2618,7 @@
     {
       "date": "2026-08-17",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2625,7 +2626,7 @@
     {
       "date": "2026-08-18",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2633,7 +2634,7 @@
     {
       "date": "2026-08-19",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2641,7 +2642,7 @@
     {
       "date": "2026-08-20",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2649,7 +2650,7 @@
     {
       "date": "2026-08-21",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2657,7 +2658,7 @@
     {
       "date": "2026-08-22",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2665,7 +2666,7 @@
     {
       "date": "2026-08-23",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2673,7 +2674,7 @@
     {
       "date": "2026-08-24",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2681,7 +2682,7 @@
     {
       "date": "2026-08-25",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2689,7 +2690,7 @@
     {
       "date": "2026-08-26",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2697,7 +2698,7 @@
     {
       "date": "2026-08-27",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2705,7 +2706,7 @@
     {
       "date": "2026-08-28",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2713,7 +2714,7 @@
     {
       "date": "2026-08-29",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2721,7 +2722,7 @@
     {
       "date": "2026-08-30",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2729,7 +2730,7 @@
     {
       "date": "2026-08-31",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2737,7 +2738,7 @@
     {
       "date": "2026-09-01",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2745,7 +2746,7 @@
     {
       "date": "2026-09-02",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2753,7 +2754,7 @@
     {
       "date": "2026-09-03",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2761,7 +2762,7 @@
     {
       "date": "2026-09-04",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2769,7 +2770,7 @@
     {
       "date": "2026-09-05",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2777,7 +2778,7 @@
     {
       "date": "2026-09-06",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2785,7 +2786,7 @@
     {
       "date": "2026-09-07",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2793,7 +2794,7 @@
     {
       "date": "2026-09-08",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2801,7 +2802,7 @@
     {
       "date": "2026-09-09",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2809,7 +2810,7 @@
     {
       "date": "2026-09-10",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2817,7 +2818,7 @@
     {
       "date": "2026-09-11",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2825,7 +2826,7 @@
     {
       "date": "2026-09-12",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2833,7 +2834,7 @@
     {
       "date": "2026-09-13",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2841,7 +2842,7 @@
     {
       "date": "2026-09-14",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2849,7 +2850,7 @@
     {
       "date": "2026-09-15",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2857,7 +2858,7 @@
     {
       "date": "2026-09-16",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2865,7 +2866,7 @@
     {
       "date": "2026-09-17",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2873,7 +2874,7 @@
     {
       "date": "2026-09-18",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2881,7 +2882,7 @@
     {
       "date": "2026-09-19",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2889,7 +2890,7 @@
     {
       "date": "2026-09-20",
       "usage_pp": 0.0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 1,
       "level": 1,
       "usage_known": false
@@ -2897,7 +2898,7 @@
     {
       "date": "2026-09-21",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2905,7 +2906,7 @@
     {
       "date": "2026-09-22",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2913,7 +2914,7 @@
     {
       "date": "2026-09-23",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2921,7 +2922,7 @@
     {
       "date": "2026-09-24",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2929,7 +2930,7 @@
     {
       "date": "2026-09-25",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2937,7 +2938,7 @@
     {
       "date": "2026-09-26",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2945,7 +2946,7 @@
     {
       "date": "2026-09-27",
       "usage_pp": 0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": false
@@ -2953,7 +2954,7 @@
     {
       "date": "2026-09-28",
       "usage_pp": 0.0,
-      "bars": 0,
+      "sections": 0,
       "sessions": 0,
       "level": 0,
       "usage_known": true
@@ -2961,7 +2962,7 @@
     {
       "date": "2026-09-29",
       "usage_pp": 7.0,
-      "bars": 2,
+      "sections": 2,
       "sessions": 1,
       "level": 1,
       "usage_known": true
@@ -2969,7 +2970,7 @@
     {
       "date": "2026-09-30",
       "usage_pp": 3.0,
-      "bars": 1,
+      "sections": 1,
       "sessions": 3,
       "level": 2,
       "usage_known": true

@@ -126,15 +126,20 @@ def five_hour_by_day(readings):
     return peaks
 
 
-def bars_for(usage_pp, config):
-    """0 to len(bar_thresholds) + 1 bars: the day's usage as a fraction of an even daily share of the week."""
+def sections_for(usage_pp, config):
+    """How many of the cell's battery sections are filled (0 to len(section_thresholds) + 1).
+
+    f = the day's usage / an even daily share of the week (100 / days_per_week).
+    f = 0 fills none; otherwise the first threshold that f doesn't exceed decides.
+    With the default thresholds [1/3, 2/3]: f <= 1/3 -> 1, <= 2/3 -> 2, above -> 3.
+    """
     if usage_pp <= EPSILON:
         return 0
     fraction = usage_pp / (100.0 / config["days_per_week"])
-    for bars, threshold in enumerate(config["bar_thresholds"], start=1):
+    for sections, threshold in enumerate(config["section_thresholds"], start=1):
         if fraction <= threshold + EPSILON:
-            return bars
-    return len(config["bar_thresholds"]) + 1
+            return sections
+    return len(config["section_thresholds"]) + 1
 
 
 # --- sessions ------------------------------------------------------------------------------
@@ -257,7 +262,7 @@ def build(inputs, today, config, generated_at):
         detail_days[day] = {
             "usage_pp": round(used, 2),
             "share_fraction": round(used / (100.0 / config["days_per_week"]), 3),
-            "bars": bars_for(used, config),
+            "sections": sections_for(used, config),
             "peak_five_hour_pct": peak, "five_hour_samples": samples,
             "sessions": totals[day], "sessions_code": n_code, "sessions_chat": n_chat,
             "inferred_session": inferred,
@@ -269,6 +274,9 @@ def build(inputs, today, config, generated_at):
     for detail in detail_days.values():
         detail["level"] = level_for(detail["sessions"], thresholds)
 
+    # Days before the first weekly reading ever recorded have no usage data: the
+    # grid draws them as a plain empty square, unlike a tracked day with 0 usage
+    # (an empty battery).
     first_reading = next((r["ts"] for r in readings if common.normalize_window(r.get("seven_day"))), None)
     usage_since = day_of(first_reading) if first_reading is not None else None
     grid_start = sunday_on_or_before(today) - timedelta(weeks=config["grid_weeks"] - 1)
@@ -279,7 +287,7 @@ def build(inputs, today, config, generated_at):
         grid.append({
             "date": day.isoformat(),
             "usage_pp": detail["usage_pp"] if detail else 0,
-            "bars": detail["bars"] if detail else 0,
+            "sections": detail["sections"] if detail else 0,
             "sessions": detail["sessions"] if detail else 0,
             "level": detail["level"] if detail else 0,
             "usage_known": usage_since is not None and day >= usage_since,
@@ -297,7 +305,7 @@ def build(inputs, today, config, generated_at):
     snapshot = {
         "version": SNAPSHOT_VERSION, "generated_at": generated_at, "today": today.isoformat(),
         "week_start": "sunday", "usage_tracked_since": usage_since.isoformat() if usage_since else None,
-        "bar_slots": len(config["bar_thresholds"]) + 1,
+        "section_count": len(config["section_thresholds"]) + 1,
         "header": header, "levels": levels, "days": grid,
     }
 

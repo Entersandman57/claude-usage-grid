@@ -19,16 +19,17 @@ struct DayContent: View {
     @ObservedObject var store: DataStore
     let date: String
 
-    private var slots: Int { store.snapshot?.slots ?? 3 }
+    private var sectionCount: Int { store.snapshot?.sectionsPerCell ?? 3 }
 
     var body: some View {
         let detail = store.details?.days[date]
         let day = store.snapshot?.days.first { $0.date == date }
         VStack(alignment: .leading, spacing: 20) {
             HStack(spacing: 12) {
-                if let day { DayCell(day: day, size: 34, style: .color, slots: slots) }
+                if let day { DayCell(day: day, size: 35, style: .color, sectionCount: sectionCount) }
                 Text(Format.longDay(date)).font(.title2.weight(.semibold))
             }
+            .frame(height: 35)  // keeps the cell on whole pixels
             stats(detail: detail, day: day)
             codeSessions(detail?.codeSessions ?? [])
             chats(detail?.chats ?? [])
@@ -46,9 +47,10 @@ struct DayContent: View {
             StatTile(title: "Weekly limit used",
                      value: known ? Format.percent(usage) : "—",
                      note: known ? "percentage points of the week" : "not tracked yet")
-            StatTile(title: "Bars",
-                     value: "\(detail?.bars ?? 0) of \(slots)",
-                     note: known ? "\(Int(((detail?.shareFraction ?? 0) * 100).rounded()))% of a day's share" : "")
+            StatTile(title: "Battery",
+                     value: known ? "\(detail?.sections ?? 0) of \(sectionCount)" : "—",
+                     note: known ? "\(Int(((detail?.shareFraction ?? 0) * 100).rounded()))% of a day's even share"
+                                 : "no data yet")
             StatTile(title: "Peak 5-hour",
                      value: detail?.peakFiveHourPct.map(Format.percent) ?? "—",
                      note: readingsNote(detail?.fiveHourSamples ?? 0))
@@ -108,7 +110,7 @@ struct DayContent: View {
                 }
                 .padding(12)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .background(Palette.emptyCell, in: RoundedRectangle(cornerRadius: 8))
+                .background(Palette.surface, in: RoundedRectangle(cornerRadius: 8))
             }
         }
     }
@@ -145,7 +147,7 @@ struct DayContent: View {
                 }
                 .controlSize(.small)
                 .padding(10)
-                .background(Palette.emptyCell, in: RoundedRectangle(cornerRadius: 8))
+                .background(Palette.surface, in: RoundedRectangle(cornerRadius: 8))
             }
         }
     }
@@ -174,6 +176,6 @@ struct StatTile: View {
         }
         .padding(10)
         .frame(maxWidth: .infinity, minHeight: 78, alignment: .topLeading)
-        .background(Palette.emptyCell, in: RoundedRectangle(cornerRadius: 8))
+        .background(Palette.surface, in: RoundedRectangle(cornerRadius: 8))
     }
 }

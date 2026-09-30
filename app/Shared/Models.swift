@@ -9,13 +9,13 @@ struct Snapshot: Codable, Equatable {
     var generatedAt: Double
     var today: String
     var usageTrackedSince: String?
-    var barSlots: Int?
+    var sectionCount: Int?
     var header: Header
     var levels: Levels
     var days: [GridDay]
 
-    /// How many battery bars a full cell has (bar_thresholds + 1 in the aggregator config).
-    var slots: Int { max(1, barSlots ?? 3) }
+    /// Battery sections per cell (section_thresholds + 1 in the aggregator config).
+    var sectionsPerCell: Int { max(1, sectionCount ?? 3) }
 }
 
 struct Header: Codable, Equatable {
@@ -41,10 +41,10 @@ struct Levels: Codable, Equatable {
 struct GridDay: Codable, Equatable, Identifiable {
     var date: String
     var usagePp: Double
-    var bars: Int
+    var sections: Int      // filled battery sections
     var sessions: Int
-    var level: Int
-    var usageKnown: Bool
+    var level: Int         // session level 1-4 (0: no sessions)
+    var usageKnown: Bool   // false: before tracking started (no data)
     var id: String { date }
 }
 
@@ -61,7 +61,7 @@ struct Details: Codable {
 struct DayDetail: Codable {
     var usagePp: Double
     var shareFraction: Double
-    var bars: Int
+    var sections: Int
     var peakFiveHourPct: Double?
     var fiveHourSamples: Int
     var sessions: Int

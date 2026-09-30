@@ -14,6 +14,10 @@ final class SharedTests: XCTestCase {
         XCTAssertEqual(snapshot.days.first?.date, "2025-09-28")  // a Sunday, 52 weeks back
         XCTAssertEqual(snapshot.days.count, 52 * 7 + 4)
         XCTAssertEqual(snapshot.header.week?.usedPct, 12)
+        XCTAssertEqual(snapshot.sectionsPerCell, 3)
+        XCTAssertEqual(snapshot.days.last?.sections, 1)
+        XCTAssertFalse(snapshot.days.first { $0.date == "2026-09-27" }!.usageKnown)  // before the first reading
+        XCTAssertTrue(snapshot.days.first { $0.date == "2026-09-28" }!.usageKnown)
 
         let details = try GridJSON.decoder().decode(Details.self, from: fixture("details"))
         let today = try XCTUnwrap(details.days["2026-09-30"])
@@ -38,6 +42,38 @@ final class SharedTests: XCTestCase {
         XCTAssertEqual(last.days.filter { $0 == nil }.count, 3)  // Thu-Sat are in the future
         XCTAssertEqual(weeks.first?.monthLabel, nil)              // Sep 28 isn't September's first Sunday
         XCTAssertEqual(weeks[1].monthLabel, "Oct")                // Oct 5 is October's
+    }
+
+    // MARK: Battery cells
+
+    func testSectionsSplitTheSquareWithOnePointDividers() {
+        XCTAssertEqual(CellGeometry.sectionHeight(size: 14, count: 3), 4)       // 4 + 1 + 4 + 1 + 4
+        XCTAssertEqual(CellGeometry.sectionHeight(size: 17, count: 3), 5)
+        XCTAssertTrue(CellGeometry.isCrisp(14, count: 3))
+        XCTAssertTrue(CellGeometry.isCrisp(15.5, count: 3))                      // 4.5 pt sections = 9 px
+        XCTAssertFalse(CellGeometry.isCrisp(14.5, count: 3))
+        XCTAssertEqual(CellGeometry.crispSize(atMost: 15.4, count: 3), 14)
+    }
+
+    func testEveryLayoutUsesCrispCells() {
+        for size in [CGSize(width: 316, height: 132), CGSize(width: 316, height: 309), CGSize(width: 684, height: 309),
+                     CGSize(width: 1005, height: 139.5), CGSize(width: 200, height: 60)] {
+            let layout = GridLayout.fit(size, availableWeeks: 53)
+            XCTAssertTrue(CellGeometry.isCrisp(layout.cell, count: 3), "\(size) -> \(layout.cell)")
+        }
+    }
+
+    func testSampleCoversEveryCellState() {
+        let days = Snapshot.sample(trackedWeeks: 17).days
+        XCTAssertTrue(days.contains { !$0.usageKnown })
+        for level in 1...4 {
+            for sections in 0...3 {
+                XCTAssertTrue(days.contains { $0.usageKnown && $0.level == level && $0.sections == sections },
+                              "level \(level), \(sections) sections")
+            }
+        }
+        let shown = Array(days.suffix(17 * 7))  // what a 17-week medium widget shows
+        XCTAssertTrue(shown.contains { !$0.usageKnown })
     }
 
     // MARK: Layout

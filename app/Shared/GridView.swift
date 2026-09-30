@@ -1,50 +1,5 @@
 import SwiftUI
 
-/// A day square: orange by session level, with Nokia-style battery bars that
-/// fill bottom-up with the share of the weekly limit used that day.
-struct DayCell: View {
-    let day: GridDay
-    let size: CGFloat
-    let style: CellStyle
-    var slots = 3
-
-    var body: some View {
-        RoundedRectangle(cornerRadius: size * 0.2, style: .continuous)
-            .fill(style.fill(level: day.level))
-            .overlay {
-                if day.bars > 0 { BatteryBars(filled: day.bars, slots: slots, size: size, style: style) }
-            }
-            .frame(width: size, height: size)
-    }
-}
-
-struct BatteryBars: View {
-    let filled: Int
-    let slots: Int
-    let size: CGFloat
-    let style: CellStyle
-
-    var body: some View {
-        let inset = max(2, (size * 0.17).rounded())
-        let spacing = max(1, (size * 0.08).rounded())
-        let inner = size - 2 * inset
-        let barHeight = (inner - CGFloat(slots - 1) * spacing) / CGFloat(slots)
-        VStack(spacing: spacing) {
-            ForEach((0..<slots).reversed(), id: \.self) { index in
-                RoundedRectangle(cornerRadius: min(1, barHeight / 2))
-                    .fill(index < filled ? style.barFill : style.barSlot)
-                    .frame(width: inner * width(of: index), height: barHeight)
-            }
-        }
-        .frame(width: inner, height: inner)
-    }
-
-    /// Like the old Nokia battery indicator, bars get longer toward the top.
-    private func width(of index: Int) -> CGFloat {
-        slots == 1 ? 1 : 0.55 + 0.45 * CGFloat(index) / CGFloat(slots - 1)
-    }
-}
-
 /// What a click or hover on a day does.
 enum GridInteraction {
     case none
@@ -58,7 +13,7 @@ enum GridInteraction {
 /// labels on top, Mon/Wed/Fri on the left. Fills whatever size it is given.
 struct GridView: View {
     let days: [GridDay]
-    var slots = 3
+    var sectionCount = 3
     var style: CellStyle = .color
     var interaction: GridInteraction = .none
     var maxBands = 3
@@ -66,15 +21,25 @@ struct GridView: View {
     var body: some View {
         GeometryReader { proxy in
             let weeks = Week.weeks(from: days)
-            let layout = GridLayout.fit(proxy.size, availableWeeks: weeks.count, maxBands: maxBands)
-            // Bands share a right edge (today's column); the block is centered in the space.
+            let layout = GridLayout.fit(proxy.size, availableWeeks: weeks.count, maxBands: maxBands,
+                                        sectionCount: sectionCount)
+            let block = layout.blockSize
+            // Bands share a right edge (today's column). The block is centered on a
+            // half-point boundary so the cells' 1 pt dividers stay on whole pixels.
             VStack(alignment: .trailing, spacing: GridLayout.bandSpacing) {
                 ForEach(Array(layout.bands(of: weeks).enumerated()), id: \.offset) { _, band in
                     bandView(band, layout: layout)
                 }
             }
-            .frame(width: proxy.size.width, height: proxy.size.height)
+            .frame(width: block.width, height: block.height, alignment: .topTrailing)
+            .padding(.leading, Self.halfPointFloor((proxy.size.width - block.width) / 2))
+            .padding(.top, Self.halfPointFloor((proxy.size.height - block.height) / 2))
+            .frame(width: proxy.size.width, height: proxy.size.height, alignment: .topLeading)
         }
+    }
+
+    private static func halfPointFloor(_ value: CGFloat) -> CGFloat {
+        max(0, (value * 2).rounded(.down) / 2)
     }
 
     private func bandView(_ weeks: [Week], layout: GridLayout) -> some View {
@@ -115,7 +80,7 @@ struct GridView: View {
     @ViewBuilder
     private func cellView(_ day: GridDay?, size: CGFloat) -> some View {
         if let day {
-            let cell = DayCell(day: day, size: size, style: style, slots: slots)
+            let cell = DayCell(day: day, size: size, style: style, sectionCount: sectionCount)
             switch interaction {
             case .none:
                 cell
@@ -144,6 +109,9 @@ struct GridView: View {
 
 /// "This week 8% · Today 2 sessions · 5h 6%"
 struct SummaryLine: View {
+    /// Fixed so whatever sits below starts on a whole point.
+    static let height: CGFloat = 16
+
     let snapshot: Snapshot
     var style: CellStyle = .color
     var now = Date()
@@ -158,6 +126,7 @@ struct SummaryLine: View {
         .font(.system(size: 11, weight: .semibold))
         .foregroundStyle(style.text)
         .lineLimit(1)
+        .frame(height: Self.height)
     }
 
     /// A window's % as of its last reading, or "—" if it has reset since then.
@@ -179,7 +148,8 @@ struct WidgetContent: View {
         if let snapshot {
             VStack(alignment: .leading, spacing: 6) {
                 if showsHeader { SummaryLine(snapshot: snapshot, style: style) }
-                GridView(days: snapshot.days, slots: snapshot.slots, style: style, interaction: links ? .links : .none)
+                GridView(days: snapshot.days, sectionCount: snapshot.sectionsPerCell, style: style,
+                         interaction: links ? .links : .none)
             }
         } else {
             VStack(alignment: .leading, spacing: 4) {
@@ -193,28 +163,42 @@ struct WidgetContent: View {
 }
 
 extension Snapshot {
-    /// A plausible made-up year for the widget gallery preview.
-    static let placeholder: Snapshot = {
+    /// The widget gallery's preview.
+    static let placeholder = sample(trackedWeeks: 17)
+
+    /// Made-up data that shows every cell state. Tracking starts on the
+    /// Wednesday `trackedWeeks - 1` weeks before this one, so the oldest visible
+    /// column opens with no-data squares. The four full weeks before this one
+    /// hold a key: one column per session level 1-4 (left to right), with
+    /// Sunday-Wednesday filled 0, 1, 2 and 3 sections. Other days are random.
+    static func sample(trackedWeeks: Int, today: Date = Date()) -> Snapshot {
         let calendar = Format.calendar
-        let today = Date()
         let weekday = calendar.component(.weekday, from: today) - 1  // Sunday = 0
-        let start = calendar.date(byAdding: .day, value: -(52 * 7 + weekday), to: today)!
+        let totalDays = 52 * 7 + weekday + 1
+        let start = calendar.date(byAdding: .day, value: -(totalDays - 1), to: today)!
+        let currentWeek = 52
+        let firstTracked = (currentWeek - (trackedWeeks - 1)) * 7 + 3
+        var seed: UInt32 = 11
         var days: [GridDay] = []
-        var seed: UInt32 = 7
-        for offset in 0...(52 * 7 + weekday) {
+        for offset in 0..<totalDays {
             seed = seed &* 1_103_515_245 &+ 12_345
-            let roll = Int((seed >> 16) % 100)
-            let sessions = roll < 35 ? 0 : roll % 9
-            let bars = sessions == 0 ? 0 : 1 + roll % 3
+            let roll = Int((seed >> 16) % 1000)
+            let week = offset / 7, row = offset % 7
+            var sections = roll % 5 == 0 ? 0 : 1 + roll % 3
+            var level = 1 + (roll / 7) % 4
+            if (currentWeek - 4..<currentWeek).contains(week), row < 4 {
+                level = week - (currentWeek - 4) + 1
+                sections = row
+            }
             let date = calendar.date(byAdding: .day, value: offset, to: start)!
-            days.append(GridDay(date: Format.iso(date), usagePp: Double(bars) * 3, bars: bars,
-                                sessions: sessions, level: min(4, (sessions + 1) / 2), usageKnown: true))
+            days.append(GridDay(date: Format.iso(date), usagePp: Double(sections) * 4.5, sections: sections,
+                                sessions: level * 2, level: level, usageKnown: offset >= firstTracked))
         }
         return Snapshot(version: 1, generatedAt: today.timeIntervalSince1970, today: Format.iso(today),
-                        usageTrackedSince: days.first?.date, barSlots: 3,
+                        usageTrackedSince: days[max(0, min(firstTracked, days.count - 1))].date, sectionCount: 3,
                         header: Header(week: UsageWindow(usedPct: 42, resetsAt: nil, asOf: 0, source: nil),
                                        fiveHour: UsageWindow(usedPct: 18, resetsAt: nil, asOf: 0, source: nil),
                                        todayUsagePp: 6, todaySessions: 3),
                         levels: Levels(mode: "fixed", thresholds: [1, 3, 6], nonzeroDays: 0), days: days)
-    }()
+    }
 }

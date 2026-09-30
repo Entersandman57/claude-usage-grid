@@ -198,9 +198,10 @@ final class DataStore: ObservableObject {
     func tooltip(for day: GridDay) -> String {
         var parts = [Format.mediumDay(day.date)]
         let detail = details?.days[day.date]
-        parts.append(day.usageKnown
-                     ? "\(Format.percent(day.usagePp)) of week (\(day.bars) of \(snapshot?.slots ?? 3) bars)"
-                     : "usage not tracked yet")
+        let sectionCount = snapshot?.sectionsPerCell ?? 3
+        parts.append(!day.usageKnown ? "before tracking started (no usage data)"
+                     : day.sections == 0 ? "\(Format.percent(day.usagePp)) of week (empty battery)"
+                     : "\(Format.percent(day.usagePp)) of week (\(day.sections) of \(sectionCount) sections)")
         if let detail, let peak = detail.peakFiveHourPct {
             parts.append("peak 5h \(Format.percent(peak))" + (detail.fiveHourSamples == 1 ? " (1 reading)" : ""))
         }

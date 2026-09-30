@@ -25,6 +25,8 @@ struct Week: Identifiable, Equatable {
 /// Priority: the most weeks that fit with cells of at least 14 pt, then the
 /// biggest cells that still show that many. A tall widget stacks the weeks
 /// into two or three bands (older band on top) instead of leaving space empty.
+/// Only "crisp" cell sizes are used, whose battery sections land on whole
+/// pixels (14, 15.5, 17 ... pt for 3 sections), so the dividers stay sharp.
 struct GridLayout: Equatable {
     var cell: CGFloat
     var gap: CGFloat
@@ -46,12 +48,15 @@ struct GridLayout: Equatable {
         Int(((width - dayLabelWidth + gap) / (cell + gap)).rounded(.down))
     }
 
-    static func fit(_ size: CGSize, availableWeeks: Int, maxBands: Int = 3, gap: CGFloat = 3) -> GridLayout {
+    static func fit(_ size: CGSize, availableWeeks: Int, maxBands: Int = 3, gap: CGFloat = 3,
+                    sectionCount: Int = 3) -> GridLayout {
         let available = max(availableWeeks, 1)
         var best: GridLayout?
         for bands in 1...max(maxBands, 1) {
             var cell = maxCell
             while cell >= minCell {
+                defer { cell -= 0.5 }
+                guard CellGeometry.isCrisp(cell, count: sectionCount) else { continue }
                 let height = CGFloat(bands) * bandHeight(cell: cell, gap: gap) + CGFloat(bands - 1) * bandSpacing
                 let perBand = columns(width: size.width, cell: cell, gap: gap)
                 let weeks = min(available, perBand * bands)
@@ -61,15 +66,20 @@ struct GridLayout: Equatable {
                     let perBandUsed = Int((Double(weeks) / Double(bands)).rounded(.up))
                     best = GridLayout(cell: cell, gap: gap, bands: bands, weeksPerBand: perBandUsed, weeks: weeks)
                 }
-                cell -= 0.5
             }
         }
         if let best { return best }
         // Too small for 14 pt cells: one band, as large as fits.
         let byHeight = (size.height - monthLabelHeight - 6 * gap) / 7
-        let cell = max(4, min(byHeight, maxCell).rounded(.down))
+        let cell = max(2, CellGeometry.crispSize(atMost: min(byHeight, maxCell), count: sectionCount))
         let weeks = max(1, min(available, columns(width: size.width, cell: cell, gap: gap)))
         return GridLayout(cell: cell, gap: gap, bands: 1, weeksPerBand: weeks, weeks: weeks)
+    }
+
+    /// Width and height of the whole block of bands (labels included).
+    var blockSize: CGSize {
+        CGSize(width: Self.dayLabelWidth + CGFloat(weeksPerBand) * (cell + gap),
+               height: CGFloat(bands) * Self.bandHeight(cell: cell, gap: gap) + CGFloat(bands - 1) * Self.bandSpacing)
     }
 
     /// The shown weeks split into bands, newest band last; only the first band may be short.

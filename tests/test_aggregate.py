@@ -118,19 +118,35 @@ def test_dst_spring_forward(new_york):
     assert usage(readings) == {"2026-03-08": 1.0, "2026-03-09": 1.0}
 
 
-@pytest.mark.parametrize("pp, bars", [
-    (0, 0), (0.01, 1), (DAY_SHARE / 3, 1), (DAY_SHARE * 0.34, 2), (DAY_SHARE * 2 / 3, 2),
-    (DAY_SHARE * 0.67, 3), (DAY_SHARE, 3), (50, 3)])
-def test_three_bars(pp, bars):
-    assert aggregate.bars_for(pp, CONFIG) == bars
+@pytest.mark.parametrize("pp, sections", [
+    (0, 0),                          # f = 0: empty battery
+    (0.01, 1),                       # 0 < f <= 1/3
+    (DAY_SHARE / 3, 1),
+    (DAY_SHARE * 0.34, 2),           # 1/3 < f <= 2/3
+    (DAY_SHARE * 2 / 3, 2),
+    (DAY_SHARE * 0.67, 3),           # f > 2/3
+    (DAY_SHARE, 3), (50, 3)])
+def test_three_sections(pp, sections):
+    assert aggregate.sections_for(pp, CONFIG) == sections
 
 
-def test_bar_slots_follow_the_config(new_york):
+def test_section_count_follows_the_config(new_york):
     snapshot, _ = build(date(2026, 9, 30))
-    assert snapshot["bar_slots"] == 3
-    four = dict(CONFIG, bar_thresholds=[0.25, 0.5, 0.75])
+    assert snapshot["section_count"] == 3
+    four = dict(CONFIG, section_thresholds=[0.25, 0.5, 0.75])
     snapshot, _ = aggregate.build(inputs(), date(2026, 9, 30), four, generated_at=0)
-    assert snapshot["bar_slots"] == 4 and aggregate.bars_for(50, four) == 4
+    assert snapshot["section_count"] == 4 and aggregate.sections_for(50, four) == 4
+
+
+def test_no_data_days_differ_from_zero_usage_days(new_york):
+    # First reading ever on Sep 28; Sep 29 is tracked but unused; Sep 30 has usage.
+    readings = [r((2026, 9, 28, 23, 55), 5), r((2026, 9, 29, 23, 55), 5), r((2026, 9, 30, 23, 55), 7)]
+    activity = [act((2026, 9, 27, 12, 0), "old")]  # a session before tracking started
+    snapshot, _ = build(date(2026, 9, 30), readings=readings, activity=activity)
+    by_date = {d["date"]: d for d in snapshot["days"]}
+    assert (by_date["2026-09-27"]["usage_known"], by_date["2026-09-27"]["sessions"]) == (False, 1)  # no data
+    assert (by_date["2026-09-29"]["usage_known"], by_date["2026-09-29"]["sections"]) == (True, 0)   # empty battery
+    assert (by_date["2026-09-30"]["usage_known"], by_date["2026-09-30"]["sections"]) == (True, 1)
 
 
 # --- sessions ------------------------------------------------------------------------------
@@ -243,7 +259,7 @@ def test_empty_history(new_york):
     snapshot, details = build(date(2026, 9, 30))
     assert details["days"] == {}
     assert snapshot["levels"] == {"mode": "fixed", "thresholds": [1, 3, 6], "nonzero_days": 0}
-    assert all(d["bars"] == 0 and d["level"] == 0 and not d["usage_known"] for d in snapshot["days"])
+    assert all(d["sections"] == 0 and d["level"] == 0 and not d["usage_known"] for d in snapshot["days"])
     assert snapshot["header"] == {"week": None, "five_hour": None, "today_usage_pp": 0, "today_sessions": 0}
     assert snapshot["usage_tracked_since"] is None
 
@@ -273,16 +289,16 @@ def test_header_and_usage_known(new_york):
     assert snapshot["header"]["today_usage_pp"] == 3.0
     assert snapshot["usage_tracked_since"] == "2026-09-30"
     assert [d["usage_known"] for d in snapshot["days"][-2:]] == [False, True]
-    assert snapshot["days"][-1] == {"date": "2026-09-30", "usage_pp": 3.0, "bars": 1, "sessions": 1,
+    assert snapshot["days"][-1] == {"date": "2026-09-30", "usage_pp": 3.0, "sections": 1, "sessions": 1,
                                     "level": 1, "usage_known": True}
 
 
 def test_user_config_overrides_thresholds(grid_home):
     grid_home.mkdir(parents=True)
-    (grid_home / "aggregator-config.json").write_text(json.dumps({"bar_thresholds": [0.1, 0.2, 0.3]}))
+    (grid_home / "aggregator-config.json").write_text(json.dumps({"section_thresholds": [0.1, 0.2, 0.3]}))
     config = aggregate.load_config()
-    assert config["bar_thresholds"] == [0.1, 0.2, 0.3] and config["grid_weeks"] == 53
-    assert aggregate.bars_for(DAY_SHARE * 0.25, config) == 3
+    assert config["section_thresholds"] == [0.1, 0.2, 0.3] and config["grid_weeks"] == 53
+    assert aggregate.sections_for(DAY_SHARE * 0.25, config) == 3
 
 
 def test_cli_writes_outputs_and_skips_malformed_lines(grid_home):
