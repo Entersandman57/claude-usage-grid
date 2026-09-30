@@ -258,7 +258,7 @@ def build(inputs, today, config, generated_at):
             "usage_pp": round(used, 2),
             "share_fraction": round(used / (100.0 / config["days_per_week"]), 3),
             "bars": bars_for(used, config),
-            "peak_5h_pct": peak, "five_hour_samples": samples,
+            "peak_five_hour_pct": peak, "five_hour_samples": samples,
             "sessions": totals[day], "sessions_code": n_code, "sessions_chat": n_chat,
             "inferred_session": inferred,
             "code_sessions": sorted(code.get(day, {}).values(), key=lambda s: s["first_ts"]),

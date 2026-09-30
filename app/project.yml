@@ -1,0 +1,82 @@
+# XcodeGen spec: `xcodegen generate` turns this into ClaudeUsageGrid.xcodeproj (not in git).
+# DEVELOPMENT_TEAM comes from the environment (scripts/build_app.sh finds your Personal Team).
+name: ClaudeUsageGrid
+options:
+  bundleIdPrefix: com.petesmacintosh
+  deploymentTarget:
+    macOS: "26.6"
+  createIntermediateGroups: true
+settings:
+  base:
+    DEVELOPMENT_TEAM: ${DEVELOPMENT_TEAM}
+    CODE_SIGN_STYLE: Automatic
+    SWIFT_VERSION: "5.0"
+    MARKETING_VERSION: "0.3.0"
+    CURRENT_PROJECT_VERSION: "3"
+    ENABLE_HARDENED_RUNTIME: NO
+targets:
+  # Menu bar app: reads ~/.claude-usage-grid (so it is not sandboxed), runs the
+  # aggregator, and is the only writer of the App Group container.
+  ClaudeUsageGrid:
+    type: application
+    platform: macOS
+    sources:
+      - path: App
+      - path: Shared
+    info:
+      path: App/Info.plist
+      properties:
+        CFBundleDisplayName: Claude Usage Grid
+        LSUIElement: true
+        LSApplicationCategoryType: public.app-category.developer-tools
+        AppGroupID: $(TeamIdentifierPrefix)claudeusagegrid
+        CFBundleURLTypes:
+          - CFBundleURLName: com.petesmacintosh.ClaudeUsageGrid
+            CFBundleURLSchemes: [claudeusagegrid]
+    entitlements:
+      path: App/ClaudeUsageGrid.entitlements
+      properties:
+        com.apple.security.application-groups:
+          - $(TeamIdentifierPrefix)claudeusagegrid
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.petesmacintosh.ClaudeUsageGrid
+        PRODUCT_NAME: ClaudeUsageGrid
+    dependencies:
+      - target: UsageGridWidget
+
+  # Widget extension: WidgetKit requires the sandbox; it only reads the App Group.
+  UsageGridWidget:
+    type: app-extension
+    platform: macOS
+    sources:
+      - path: Widget
+      - path: Shared
+    info:
+      path: Widget/Info.plist
+      properties:
+        CFBundleDisplayName: Claude Usage Grid
+        AppGroupID: $(TeamIdentifierPrefix)claudeusagegrid
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension
+    entitlements:
+      path: Widget/UsageGridWidget.entitlements
+      properties:
+        com.apple.security.app-sandbox: true
+        com.apple.security.application-groups:
+          - $(TeamIdentifierPrefix)claudeusagegrid
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.petesmacintosh.ClaudeUsageGrid.Widget
+
+  # Unit tests for the shared layout, decoding and link code.
+  SharedTests:
+    type: bundle.unit-test
+    platform: macOS
+    sources:
+      - path: Tests
+      - path: Shared
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.petesmacintosh.ClaudeUsageGrid.SharedTests
+        GENERATE_INFOPLIST_FILE: YES
