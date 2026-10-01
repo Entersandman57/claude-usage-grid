@@ -1,4 +1,5 @@
 import Foundation
+import ServiceManagement
 import WidgetKit
 
 enum GridError: LocalizedError {
@@ -23,6 +24,7 @@ final class DataStore: ObservableObject {
     @Published private(set) var details: Details?
     @Published private(set) var lastError: String?
     @Published private(set) var widgetUpdatedAt: Date?
+    @Published private(set) var launchAtLogin = LoginItem.isEnabled
 
     /// ~/.claude-usage-grid, or CLAUDE_USAGE_GRID_HOME like the Python side (for tests).
     let dataDir: URL = ProcessInfo.processInfo.environment["CLAUDE_USAGE_GRID_HOME"].map { URL(fileURLWithPath: $0) }
@@ -65,7 +67,18 @@ final class DataStore: ObservableObject {
         return changed
     }
 
+    func setLaunchAtLogin(_ enabled: Bool) {
+        do {
+            try LoginItem.set(enabled)
+        } catch {
+            lastError = "Launch at login: \(error.localizedDescription)"
+        }
+        launchAtLogin = LoginItem.isEnabled
+        if LoginItem.status == .requiresApproval { SMAppService.openSystemSettingsLoginItems() }
+    }
+
     func refresh() {
+        launchAtLogin = LoginItem.isEnabled
         guard !isRefreshing else { refreshAgain = true; return }
         isRefreshing = true
         let dataDir = self.dataDir
@@ -308,6 +321,7 @@ final class DataStore: ObservableObject {
             }
         }
         if let at = widgetUpdatedAt { lines.append("Widget updated: \(Format.moment(at.timeIntervalSince1970))") }
+        lines.append(LoginItem.statusText)
         if let lastError { lines.append("Error: \(lastError)") }
         return lines.isEmpty ? ["Building your grid…"] : lines
     }
