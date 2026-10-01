@@ -89,6 +89,8 @@ def test_defensive_about_odd_conversations(grid_home, tmp_path, new_york):
          "created_at": "2026-09-01T12:00:00Z", "updated_at": "2026-09-02T12:00:00Z"},
         {"name": "No id", "chat_messages": [message("2026-09-29T12:00:00Z")]},
         {"uuid": "c5", "name": "No dates at all"},
+        {"uuid": "c7", "name": "Opened, never used", "chat_messages": [],   # 4 of these in the real export
+         "created_at": "2026-09-29T12:00:00Z", "updated_at": "2026-09-29T12:00:00Z"},
         "not an object",
         conversation("c6", None, "2026-09-29T12:00:00Z", extra_unknown_field={"x": 1}),
     ])
@@ -98,7 +100,7 @@ def test_defensive_about_odd_conversations(grid_home, tmp_path, new_york):
     assert stored["c2"] == {"uuid": "c2", "title": "Alt keys", "days": ["2026-09-28"]}
     assert stored["c3"]["days"] == ["2026-09-01", "2026-09-02"]
     assert summary["dated_by_conversation_times"] == 1
-    assert summary["skipped"] == {"no id": 1, "no dates": 1, "not an object": 1}
+    assert summary["skipped"] == {"no id": 1, "no dates": 1, "no messages": 1, "not an object": 1}
     assert sorted(stored) == ["c1", "c2", "c3", "c6"]
 
 

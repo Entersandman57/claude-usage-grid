@@ -133,12 +133,15 @@ def summarize(conversation):
     title = title.strip() if isinstance(title, str) and title.strip() else None
     days, source = set(), "messages"
     messages = first(conversation, MESSAGE_LIST_KEYS)
-    for message in messages if isinstance(messages, list) else []:
-        if isinstance(message, dict):
-            moment = parse_time(first(message, MESSAGE_TIME_KEYS))
-            if moment:
-                days.add(local_day(moment))
-    if not days:  # no usable message times: fall back to the conversation's own
+    messages = [m for m in messages if isinstance(m, dict)] if isinstance(messages, list) else None
+    for message in messages or []:
+        moment = parse_time(first(message, MESSAGE_TIME_KEYS))
+        if moment:
+            days.add(local_day(moment))
+    if messages == []:
+        # A chat that was opened but never had a message doesn't count on any day.
+        return None, "no messages"
+    if not days:  # messages without usable times: fall back to the conversation's own
         source = "conversation times"
         for key in CONVERSATION_TIME_KEYS:
             moment = parse_time(conversation.get(key))
