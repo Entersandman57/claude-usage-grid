@@ -211,13 +211,18 @@ def level_thresholds(totals, today, config):
     Levels are relative to your history: quartiles of the non-zero session days
     in the trailing level_window_days (all history if shorter). Until there are
     quartile_min_days such days, fixed buckets are used (1 / 2-3 / 4-6 / 7+).
+    Each threshold is at least one session above the previous one, so a history
+    of mostly 1-session days can't collapse the levels (quartiles 1, 1, 1 would
+    make a 2-session day level 4; they become 1, 2, 3).
     """
     start = today - timedelta(days=config["level_window_days"] - 1)
     nonzero = [n for day, n in totals.items() if start <= day <= today and n > 0]
     if len(nonzero) < config["quartile_min_days"]:
         return "fixed", list(config["fixed_level_thresholds"]), len(nonzero)
-    quartiles = statistics.quantiles(nonzero, n=4, method="inclusive")
-    return "quartiles", [round(q, 4) for q in quartiles], len(nonzero)
+    thresholds = []
+    for quartile in statistics.quantiles(nonzero, n=4, method="inclusive"):
+        thresholds.append(max(quartile, thresholds[-1] + 1) if thresholds else quartile)
+    return "quartiles", [round(t, 4) for t in thresholds], len(nonzero)
 
 
 def level_for(sessions, thresholds):

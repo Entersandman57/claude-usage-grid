@@ -18,7 +18,7 @@ Columns are weeks (oldest on the left, this week on the right), rows run Sunday 
 | ⅓ < f ≤ ⅔ | 2 sections filled |
 | f > ⅔ | 3 sections filled |
 
-**The orange shows how many sessions you had** (Claude Code sessions plus claude.ai chats). Fewer sessions are a light, whitish orange; more are a deep, vivid orange. Levels are quartiles of your own days with sessions over the last year. Until you have 14 such days, fixed buckets are used: 1, 2–3, 4–6, and 7 or more sessions.
+**The orange shows how many sessions you had** (Claude Code sessions plus claude.ai chats). Fewer sessions are a light, whitish orange; more are a deep, vivid orange. Levels are quartiles of your own days with sessions over the last year, with each level at least one session above the one before (so a history of mostly 1-session days still uses all four shades). Until you have 14 such days, fixed buckets are used: 1, 2–3, 4–6, and 7 or more sessions.
 
 | Level | 1 | 2 | 3 | 4 |
 |---|---|---|---|---|

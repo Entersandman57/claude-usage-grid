@@ -247,6 +247,16 @@ def test_quartiles_once_there_are_14_nonzero_days(new_york):
     assert by_count == {1: 1, 2: 1, 3: 2, 4: 2, 5: 3, 6: 4, 8: 4, 10: 4}
 
 
+def test_quartiles_never_collapse(new_york):
+    # The real history on 2026-09-30: 31 one-session days, 6 two, 2 three, 1 ten.
+    counts = [10] + [1] * 31 + [2] * 6 + [3] * 2
+    _, details = build(date(2026, 9, 30), activity=days_with(counts))
+    assert details["levels"] == {"mode": "quartiles", "thresholds": [1.0, 2.0, 3.0], "nonzero_days": 40}
+    by_count = {n: details["days"][(date(2026, 9, 30) - timedelta(days=i)).isoformat()]["level"]
+                for i, n in enumerate(counts)}
+    assert by_count == {1: 1, 2: 2, 3: 3, 10: 4}
+
+
 def test_quartiles_only_use_the_trailing_365_days(new_york):
     old = days_with([9] * 20, end=date(2025, 9, 1))   # over a year before "today"
     recent = days_with([1] * 5)
