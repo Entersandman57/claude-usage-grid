@@ -92,7 +92,7 @@ In the day view, **Open in Claude** opens a chat in the desktop app and **Open i
 
 ## Resuming Claude Code sessions
 
-In the day view, **Resume in Terminal** opens a terminal in the session's folder with `/resume <id>` typed in, using the CLI's documented `claude-cli://` link; press Enter to resume. (If your CLI version doesn't run slash commands that arrive through a link, run `claude --resume <id>` in that folder instead.) Desktop sessions also get **Open Claude**, which brings the app forward so you can pick the session in its sidebar: the desktop app has no documented link to an existing session, and it ignores slash commands that arrive through links.
+In the day view, **Resume in Terminal** opens a terminal in the session's folder with `/resume <id>` typed in, using the CLI's documented `claude-cli://` link; press Enter to resume. (Tested with Claude Code 2.1.285. If a future version stops accepting slash commands from links, run `claude --resume <id>` in that folder instead.) Desktop sessions also get **Open Claude**, which brings the app forward so you can pick the session in its sidebar: the desktop app has no documented link to an existing session, and it ignores slash commands that arrive through links.
 
 Claude Code deletes transcripts after `cleanupPeriodDays` (30 by default); after that a session is still listed, but without Resume. If you want Resume to work for the whole grid, add `"cleanupPeriodDays": 365` to `~/.claude/settings.json`. Transcripts stay on your disk only, typically well under 1 GB a year.
 

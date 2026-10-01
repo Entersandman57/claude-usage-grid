@@ -80,7 +80,7 @@ Verified on 2026-09-30. You use Claude Code **only in the desktop app's Code tab
 4. **Session counts are unaffected.** Hooks run in desktop (documented; confirmed live in Phase 1), and desktop sessions are in `list_sessions()`.
 5. **Resume: tested in Phase 3, so the desktop gets "Open Claude".** Desktop resume via `claude://code/new?folder=…&q=%2Fresume%20<id>` doesn't work. The desktop app turns a link's leading `/` into a full-width `／`, so slash commands from links never run, and there's no documented route to an existing Code session.
    - Desktop sessions get **Open Claude**, which brings the app forward so you can find the session in its sidebar by title.
-   - Every session keeps **Resume in Terminal** (`claude-cli://open?cwd=…&q=%2Fresume%20<id>`, from your spec; that handler is registered).
+   - Every session keeps **Resume in Terminal** (`claude-cli://open?cwd=…&q=%2Fresume%20<id>`, from your spec). Confirmed working on Sep 30 with CLI 2.1.285: unlike the desktop app, the terminal CLI runs the pre-filled `/resume` when you press Enter.
    - Chats open with `claude://claude.ai/chat/<uuid>` (documented), with https as a fallback.
    - The VS Code link is dropped.
 
