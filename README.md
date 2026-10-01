@@ -1,5 +1,7 @@
 # Claude usage grid
 
+> **This project is vibe coded.** It was written by Claude (Anthropic's AI) in Claude Code, from my spec and feedback, with me testing it on my own Mac. I didn't write the code by hand. Treat it as a personal project, not reviewed production software.
+
 A macOS desktop widget, styled like GitHub's contribution graph, that charts your daily Claude usage. Each day is a little battery: how much of your weekly plan limit you used, filled in the orange that shows how many sessions you had. A menu bar app hosts it, with a full-year grid window and a view of each day's sessions and chats.
 
 ![The medium widget, with made-up sample data](docs/widget-medium-sample.png)
