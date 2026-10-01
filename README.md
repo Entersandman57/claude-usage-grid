@@ -31,3 +31,12 @@ Unfilled sections are `#2e3037`, and the thin dividers show the widget's backgro
 **Update Now** (top of the grid window, or ⌘U in the menu bar menu) takes a fresh usage reading, which is one tiny Claude call, and refreshes your sessions. Otherwise sessions update on their own within seconds, and usage is read automatically once a day.
 
 The thresholds live in `aggregator/aggregator-config.json`. To override them, copy it to `~/.claude-usage-grid/aggregator-config.json` and edit the copy. `section_thresholds` sets how many sections a day has.
+
+## Importing your claude.ai chats
+
+Claude Code sessions are picked up automatically. Chats in claude.ai (or in the desktop app's Chat tab) come from Anthropic's data export:
+
+1. On claude.ai, go to **Settings → Privacy → Export data**. A download link arrives by email.
+2. Drop the downloaded ZIP onto the app's grid window, or click **Import claude.ai Export…** there or in the menu bar menu (⌘I).
+
+Only each chat's ID, title and the days it had messages are kept, in `~/.claude-usage-grid/chats.json`. Message text is never stored: the app imports from a temporary copy of the export and deletes it right away. The status list shows "Chats imported through <date>". Chats after that date aren't counted until you import a newer export. Re-importing is safe: chats are updated, and chats you've since deleted on claude.ai are kept.

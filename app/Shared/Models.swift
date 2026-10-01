@@ -98,6 +98,7 @@ struct Status: Codable {
     var sessionsUpdatedAt: Double?
     var hooksFirstTs: Double?
     var chatsImportedThrough: String?
+    var chatsImportedAt: Double?
 }
 
 struct LastReading: Codable {

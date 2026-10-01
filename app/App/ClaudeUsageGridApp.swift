@@ -32,6 +32,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             NSApp.terminate(nil)
             return
         }
+        // `--import <export>`: the Import button's code path, from the command line.
+        if let index = arguments.firstIndex(of: "--import"), index + 1 < arguments.count {
+            let source = URL(fileURLWithPath: arguments[index + 1])
+            let message = (try? DataStore.runImport(source: source, dataDir: DataStore.shared.dataDir))
+                ?? "Import failed: couldn't read \(source.lastPathComponent)"
+            print(message)
+            NSApp.terminate(nil)
+            return
+        }
         DataStore.shared.start()
         // Opened by hand (Finder, Spotlight): show the grid, since the menu bar icon
         // can be hidden on a crowded menu bar. Not at login, not for scripted
@@ -67,6 +76,9 @@ struct MenuContent: View {
         Button(store.updating ? "Updating…" : "Update Now") { store.updateNow() }
             .keyboardShortcut("u")
             .disabled(store.updating)
+        Button("Import claude.ai Export…") { WindowManager.shared.chooseExport() }
+            .keyboardShortcut("i")
+            .disabled(store.importing)
         Divider()
         ForEach(store.statusLines, id: \.self) { Text($0) }
         Divider()

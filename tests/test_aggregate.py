@@ -207,6 +207,7 @@ def test_chats_and_code_sessions_are_split(new_york):
     assert [c["title"] for c in today["chats"]] == ["Essay help", "Recipes"]
     assert details["days"]["2026-09-29"]["sessions"] == 1
     assert details["status"]["chats_imported_through"] == "2026-09-30"
+    assert details["status"]["chats_imported_at"] is None  # the fixture has no import time
 
 
 def test_usage_without_a_known_session_counts_as_one(new_york):

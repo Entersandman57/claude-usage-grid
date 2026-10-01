@@ -1,5 +1,6 @@
 import AppKit
 import SwiftUI
+import UniformTypeIdentifiers
 
 /// Opens the grid and day windows. A menu bar app has no main window, so it
 /// manages plain NSWindows hosting SwiftUI views and brings itself forward.
@@ -44,6 +45,20 @@ final class WindowManager {
             dayWindow = makeWindow(title: Format.longDay(date), controller: host)
         }
         present(dayWindow!)
+    }
+
+    /// Pick a claude.ai data export to import.
+    func chooseExport() {
+        NSApp.activate()
+        let panel = NSOpenPanel()
+        panel.title = "Import your claude.ai data export"
+        panel.message = "Choose the ZIP from claude.ai › Settings › Privacy › Export data."
+        panel.allowedContentTypes = [.zip, .json, .folder]
+        panel.canChooseDirectories = true
+        panel.allowsMultipleSelection = false
+        guard panel.runModal() == .OK, let url = panel.url else { return }
+        DataStore.shared.importChats(from: url)
+        showGrid()
     }
 
     private func makeWindow(title: String, controller: NSViewController) -> NSWindow {

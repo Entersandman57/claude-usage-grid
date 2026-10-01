@@ -324,6 +324,7 @@ def build(inputs, today, config, generated_at):
             "sessions_updated_at": inputs["sessions_updated_at"],
             "hooks_first_ts": min((r["ts"] for r in inputs["activity"]), default=None),
             "chats_imported_through": inputs["chats"].get("imported_through"),
+            "chats_imported_at": inputs["chats"].get("imported_at"),
         },
     }
     return snapshot, details

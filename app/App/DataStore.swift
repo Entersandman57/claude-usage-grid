@@ -24,7 +24,9 @@ final class DataStore: ObservableObject {
     @Published private(set) var lastError: String?
     @Published private(set) var widgetUpdatedAt: Date?
 
-    let dataDir = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent(".claude-usage-grid")
+    /// ~/.claude-usage-grid, or CLAUDE_USAGE_GRID_HOME like the Python side (for tests).
+    let dataDir: URL = ProcessInfo.processInfo.environment["CLAUDE_USAGE_GRID_HOME"].map { URL(fileURLWithPath: $0) }
+        ?? FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent(".claude-usage-grid")
 
     private static let watchedFiles = ["readings.jsonl", "activity.jsonl", "sessions.json", "chats.json",
                                        "state/meter.json", "aggregator-config.json"]
@@ -147,24 +149,85 @@ final class DataStore: ObservableObject {
         }
     }
 
+    @Published private(set) var importing = false
+    @Published private(set) var importMessage: String?
+
+    private struct ImportSummary: Decodable {
+        var ok: Bool
+        var error: String?
+        var conversationsInExport: Int?
+        var imported: Int?
+        var importedThrough: String?
+    }
+
+    /// Imports a claude.ai data export (ZIP, conversations.json, or unzipped folder).
+    func importChats(from source: URL) {
+        guard !importing else { return }
+        importing = true
+        importMessage = "Importing \(source.lastPathComponent)…"
+        let dataDir = self.dataDir
+        Task.detached(priority: .userInitiated) {
+            let message: String
+            do {
+                message = try DataStore.runImport(source: source, dataDir: dataDir)
+            } catch {
+                message = "Import failed: \(error.localizedDescription)"
+            }
+            await MainActor.run {
+                self.importing = false
+                self.importMessage = message
+                self.refresh()
+            }
+        }
+    }
+
+    /// The export holds every message in full. The app copies it into its own
+    /// folder (it has your permission for the file you picked; the Python helper
+    /// may not), imports uuid, title and days, and deletes the copy right away.
+    nonisolated static func runImport(source: URL, dataDir: URL) throws -> String {
+        let work = dataDir.appendingPathComponent("imports/\(UUID().uuidString)", isDirectory: true)
+        try FileManager.default.createDirectory(at: work, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: work) }
+        let copy = work.appendingPathComponent(source.lastPathComponent)
+        try FileManager.default.copyItem(at: source, to: copy)
+        let output = try run("/usr/bin/python3", [dataDir.appendingPathComponent("bin/import_chats.py").path, copy.path],
+                             allowFailure: true)
+        let summary = try GridJSON.decoder().decode(ImportSummary.self, from: output)
+        guard summary.ok else { return "Import failed: \(summary.error ?? "unknown error")" }
+        let through = summary.importedThrough.map { ", through \(Format.mediumDay($0))" } ?? ""
+        return "Imported \(summary.imported ?? 0) of \(summary.conversationsInExport ?? 0) chats\(through)."
+    }
+
     // MARK: - Running the Python side
 
-    nonisolated static func run(_ executable: String, _ arguments: [String]) throws {
+    /// Runs a helper and returns its stdout. A non-zero exit throws with the last
+    /// stderr line, unless `allowFailure` (for helpers that report errors as JSON).
+    @discardableResult
+    nonisolated static func run(_ executable: String, _ arguments: [String], allowFailure: Bool = false) throws -> Data {
         let process = Process()
         process.executableURL = URL(fileURLWithPath: executable)
         process.arguments = arguments
-        let errors = Pipe()
+        let output = Pipe(), errors = Pipe()
+        process.standardOutput = output
         process.standardError = errors
-        process.standardOutput = FileHandle.nullDevice
         try process.run()
-        let stderr = errors.fileHandleForReading.readDataToEndOfFile()
+        var stderr = Data()
+        let readErrors = DispatchGroup()
+        readErrors.enter()
+        DispatchQueue.global().async {
+            stderr = errors.fileHandleForReading.readDataToEndOfFile()
+            readErrors.leave()
+        }
+        let stdout = output.fileHandleForReading.readDataToEndOfFile()
+        readErrors.wait()
         process.waitUntilExit()
-        guard process.terminationStatus == 0 else {
+        guard process.terminationStatus == 0 || allowFailure else {
             let lastLine = String(decoding: stderr, as: UTF8.self)
                 .split(separator: "\n").last.map(String.init) ?? "exit status \(process.terminationStatus)"
             let script = URL(fileURLWithPath: arguments.first ?? executable).lastPathComponent
             throw GridError.command("\(script): \(lastLine)")
         }
+        return stdout
     }
 
     nonisolated static func aggregate(dataDir: URL) throws -> (Snapshot, Details, Data) {
@@ -237,8 +300,12 @@ final class DataStore: ObservableObject {
             } else {
                 lines.append("Last meter run: none yet")
             }
-            lines.append(status.chatsImportedThrough.map { "Chats imported through \(Format.mediumDay($0))" }
-                         ?? "Chats: not imported yet")
+            if let through = status.chatsImportedThrough {
+                let when = status.chatsImportedAt.map { " (last import \(Format.moment($0)))" } ?? ""
+                lines.append("Chats imported through \(Format.mediumDay(through))\(when)")
+            } else {
+                lines.append("Chats: not imported yet (drop your claude.ai export on the grid window)")
+            }
         }
         if let at = widgetUpdatedAt { lines.append("Widget updated: \(Format.moment(at.timeIntervalSince1970))") }
         if let lastError { lines.append("Error: \(lastError)") }
