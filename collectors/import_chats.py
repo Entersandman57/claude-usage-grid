@@ -98,7 +98,21 @@ def read_conversations(path):
         return json.load(f), None
 
 
+def manifest_hint(data):
+    """If data is the export's manifest (a list of files to download), say which one to get."""
+    if not (isinstance(data, dict) and isinstance(data.get("data_files"), list)):
+        return None
+    names = [f.get("filename") for f in data["data_files"]
+             if isinstance(f, dict) and f.get("category") == "conversations" and f.get("filename")]
+    wanted = " and ".join(names) or "the conversations file"
+    return ("This is the export's manifest, a list of files to download, not the chats themselves. "
+            "Download %s from it (each link works once), then import that." % wanted)
+
+
 def conversations_from(data):
+    hint = manifest_hint(data)
+    if hint:
+        raise ExportError(hint)
     if isinstance(data, list):
         return data
     if isinstance(data, dict):

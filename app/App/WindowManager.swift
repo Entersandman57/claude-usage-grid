@@ -52,7 +52,7 @@ final class WindowManager {
         NSApp.activate()
         let panel = NSOpenPanel()
         panel.title = "Import your claude.ai data export"
-        panel.message = "Choose the ZIP from claude.ai › Settings › Privacy › Export data."
+        panel.message = "Choose conversations-000.zip from your claude.ai data export (Settings › Privacy › Export data)."
         panel.allowedContentTypes = [.zip, .json, .folder]
         panel.canChooseDirectories = true
         panel.allowsMultipleSelection = false

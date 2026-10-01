@@ -154,6 +154,22 @@ def test_not_a_list_is_an_error(grid_home, tmp_path):
     assert json.loads(result.stdout) == {"ok": False, "error": "conversations.json isn't a list of conversations"}
 
 
+def test_manifest_explains_what_to_download(grid_home, tmp_path):
+    # The shape of the real manifest from claude.ai (Sep 2026), with made-up values.
+    manifest = {"instructions": "Download each file using the export_url.", "created_at": "2026-10-01T00:10:34+00:00",
+                "total_files": 2, "version": "1.0",
+                "data_files": [{"batch_index": 0, "export_url": "https://claude.ai/x/1", "category": "light_metadata",
+                                "part": 0, "filename": "light_metadata-000.zip"},
+                               {"batch_index": 1, "export_url": "https://claude.ai/x/2", "category": "conversations",
+                                "part": 0, "filename": "conversations-000.zip"}]}
+    path = tmp_path / "manifest-123.json"
+    path.write_text(json.dumps(manifest))
+    result = run_collector("import_chats.py", args=(str(path),))
+    summary = json.loads(result.stdout)
+    assert summary["ok"] is False
+    assert "manifest" in summary["error"] and "conversations-000.zip" in summary["error"]
+
+
 def test_cli_under_system_python(grid_home, tmp_path):
     export = make_export(tmp_path, [conversation("c1", "Hello", "2026-09-29T12:00:00Z")])
     result = run_collector("import_chats.py", args=(str(export),), env={"TZ": "America/New_York"})
