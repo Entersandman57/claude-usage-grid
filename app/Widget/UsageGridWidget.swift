@@ -32,6 +32,8 @@ struct Provider: TimelineProvider {
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<GridEntry>) -> Void) {
+        SnapshotStore.log.info(
+            "widget \(String(describing: context.family), privacy: .public) display \(context.displaySize.width)x\(context.displaySize.height)")
         let now = Date()
         let halfHour = now.addingTimeInterval(30 * 60)
         let midnight = Format.calendar.startOfDay(for: now).addingTimeInterval(24 * 3600 + 60)
@@ -49,6 +51,7 @@ struct UsageGridEntryView: View {
                       showsHeader: family != .systemMedium,
                       style: CellStyle(fullColor: renderingMode == .fullColor),
                       message: entry.problem ?? SnapshotStore.LoadError.noFile.message)
+            .padding(WidgetContent.padding)
             .widgetURL(DeepLink.grid)
     }
 }
@@ -61,8 +64,11 @@ struct UsageGridWidget: Widget {
                 .containerBackground(for: .widget) { Palette.background }
         }
         .configurationDisplayName("Claude Usage Grid")
-        .description("Bars: share of your weekly limit used that day. Orange: how many sessions.")
+        .description("Each day is a battery: how much of your weekly limit you used. Orange: how many sessions.")
         .supportedFamilies([.systemMedium, .systemLarge, .systemExtraLarge])
+        // macOS's default margins are 18 pt a side (a 344x164 medium widget leaves
+        // 308x128). Our own 12 pt leaves room for 14 pt cells with 4 pt gaps.
+        .contentMarginsDisabled()
     }
 }
 

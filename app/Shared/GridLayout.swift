@@ -34,6 +34,7 @@ struct GridLayout: Equatable {
     var weeksPerBand: Int
     var weeks: Int
 
+    static let cellGap: CGFloat = 4
     static let dayLabelWidth: CGFloat = 24
     static let monthLabelHeight: CGFloat = 13
     static let bandSpacing: CGFloat = 8
@@ -48,7 +49,7 @@ struct GridLayout: Equatable {
         Int(((width - dayLabelWidth + gap) / (cell + gap)).rounded(.down))
     }
 
-    static func fit(_ size: CGSize, availableWeeks: Int, maxBands: Int = 3, gap: CGFloat = 3,
+    static func fit(_ size: CGSize, availableWeeks: Int, maxBands: Int = 3, gap: CGFloat = cellGap,
                     sectionCount: Int = 3) -> GridLayout {
         let available = max(availableWeeks, 1)
         var best: GridLayout?

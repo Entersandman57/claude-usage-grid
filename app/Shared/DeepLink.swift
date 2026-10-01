@@ -2,7 +2,8 @@ import Foundation
 
 /// URLs in and out of the app.
 ///
-/// In: claudeusagegrid://day/YYYY-MM-DD (widget cells) and claudeusagegrid://grid.
+/// In: claudeusagegrid://day/YYYY-MM-DD (widget cells), claudeusagegrid://grid, and
+/// claudeusagegrid://update (the same as the Update Now button).
 /// Out: documented Claude links. Both query values are percent-encoded with the
 /// RFC 3986 unreserved set only, so "/" becomes %2F and a space %20.
 enum DeepLink {
@@ -11,6 +12,7 @@ enum DeepLink {
     enum Route: Equatable {
         case grid
         case day(String)
+        case update
     }
 
     static var grid: URL { URL(string: "\(scheme)://grid")! }
@@ -21,6 +23,7 @@ enum DeepLink {
         guard url.scheme == scheme else { return nil }
         switch url.host {
         case "grid": return .grid
+        case "update": return .update
         case "day":
             let date = url.pathComponents.dropFirst().first ?? ""
             return date.range(of: #"^\d{4}-\d{2}-\d{2}$"#, options: .regularExpression) != nil ? .day(date) : nil

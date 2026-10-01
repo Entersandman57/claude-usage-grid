@@ -64,10 +64,9 @@ struct MenuContent: View {
             .keyboardShortcut("g")
         Button("Open Today…") { WindowManager.shared.showDay(Format.iso(Date())) }
             .keyboardShortcut("t")
-        Button("Refresh Now") { store.refresh() }
-            .keyboardShortcut("r")
-        Button(store.takingReading ? "Taking Reading…" : "Take Reading Now") { store.takeReading() }
-            .disabled(store.takingReading)
+        Button(store.updating ? "Updating…" : "Update Now") { store.updateNow() }
+            .keyboardShortcut("u")
+            .disabled(store.updating)
         Divider()
         ForEach(store.statusLines, id: \.self) { Text($0) }
         Divider()

@@ -139,6 +139,9 @@ struct SummaryLine: View {
 
 /// The widget's content, also rendered by the app for previews.
 struct WidgetContent: View {
+    /// Padding inside the widget (default content margins are turned off).
+    static let padding: CGFloat = 12
+
     let snapshot: Snapshot?
     var showsHeader: Bool
     var style: CellStyle = .color

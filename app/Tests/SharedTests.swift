@@ -56,8 +56,8 @@ final class SharedTests: XCTestCase {
     }
 
     func testEveryLayoutUsesCrispCells() {
-        for size in [CGSize(width: 316, height: 132), CGSize(width: 316, height: 309), CGSize(width: 684, height: 309),
-                     CGSize(width: 1005, height: 139.5), CGSize(width: 200, height: 60)] {
+        for size in [CGSize(width: 320, height: 140), CGSize(width: 320, height: 298), CGSize(width: 680, height: 298),
+                     CGSize(width: 1060, height: GridLayout.bandHeight(cell: 15.5, gap: 4)), CGSize(width: 200, height: 60)] {
             let layout = GridLayout.fit(size, availableWeeks: 53)
             XCTAssertTrue(CellGeometry.isCrisp(layout.cell, count: 3), "\(size) -> \(layout.cell)")
         }
@@ -78,30 +78,36 @@ final class SharedTests: XCTestCase {
 
     // MARK: Layout
 
+    // Real sizes: a medium widget is 344x164 pt on this Mac; minus 12 pt padding.
     func testMediumFitsOneBandOfAboutFourMonths() {
-        let layout = GridLayout.fit(CGSize(width: 316, height: 132), availableWeeks: 53)
+        let layout = GridLayout.fit(CGSize(width: 320, height: 140), availableWeeks: 53)
         XCTAssertEqual(layout.bands, 1)
-        XCTAssertGreaterThanOrEqual(layout.cell, 14)
-        XCTAssertEqual(layout.weeks, GridLayout.columns(width: 316, cell: layout.cell, gap: 3))
-        XCTAssertGreaterThanOrEqual(layout.weeks, 16)
+        XCTAssertEqual(layout.cell, 14)
+        XCTAssertEqual(layout.gap, 4)
+        XCTAssertEqual(layout.weeks, 16)
+    }
+
+    func testMacOSDefaultMarginsWouldForceSmallerCells() {
+        // With macOS's own 18 pt margins (308x128), 14 pt cells don't fit.
+        XCTAssertLessThan(GridLayout.fit(CGSize(width: 308, height: 128), availableWeeks: 53).cell, 14)
     }
 
     func testLargeStacksTwoBands() {
-        let layout = GridLayout.fit(CGSize(width: 316, height: 309), availableWeeks: 53)
+        let layout = GridLayout.fit(CGSize(width: 320, height: 298), availableWeeks: 53)  // 344x344, header
         XCTAssertEqual(layout.bands, 2)
         XCTAssertGreaterThanOrEqual(layout.cell, 14)
-        XCTAssertGreaterThanOrEqual(layout.weeks, 32)
+        XCTAssertEqual(layout.weeks, 32)
     }
 
     func testExtraLargeShowsTheWholeYear() {
-        let layout = GridLayout.fit(CGSize(width: 684, height: 309), availableWeeks: 53)
+        let layout = GridLayout.fit(CGSize(width: 680, height: 298), availableWeeks: 53)  // 704x344, header
         XCTAssertEqual(layout.weeks, 53)
         XCTAssertEqual(layout.bands, 2)
-        XCTAssertGreaterThan(layout.cell, 14)  // room to spare goes into bigger cells
+        XCTAssertGreaterThanOrEqual(layout.cell, 14)
     }
 
     func testFewWeeksUseBigCellsInOneBand() {
-        let layout = GridLayout.fit(CGSize(width: 684, height: 309), availableWeeks: 5)
+        let layout = GridLayout.fit(CGSize(width: 680, height: 298), availableWeeks: 5)
         XCTAssertEqual(layout.weeks, 5)
         XCTAssertEqual(layout.bands, 1)
         XCTAssertEqual(layout.cell, GridLayout.maxCell)
@@ -117,7 +123,7 @@ final class SharedTests: XCTestCase {
     func testBandsPutTheNewestWeeksLast() throws {
         let snapshot = try GridJSON.decoder().decode(Snapshot.self, from: fixture("snapshot"))
         let weeks = Week.weeks(from: snapshot.days)
-        let layout = GridLayout(cell: 14, gap: 3, bands: 2, weeksPerBand: 27, weeks: 53)
+        let layout = GridLayout(cell: 14, gap: 4, bands: 2, weeksPerBand: 27, weeks: 53)
         let bands = layout.bands(of: weeks)
         XCTAssertEqual(bands.map(\.count), [26, 27])
         XCTAssertEqual(bands.last?.last, weeks.last)
@@ -144,6 +150,7 @@ final class SharedTests: XCTestCase {
     func testParsesAppRoutes() {
         XCTAssertEqual(DeepLink.parse(DeepLink.day("2026-09-30")), .day("2026-09-30"))
         XCTAssertEqual(DeepLink.parse(DeepLink.grid), .grid)
+        XCTAssertEqual(DeepLink.parse(URL(string: "claudeusagegrid://update")!), .update)
         XCTAssertNil(DeepLink.parse(URL(string: "claudeusagegrid://day/../../etc")!))
         XCTAssertNil(DeepLink.parse(URL(string: "https://example.com/day/2026-09-30")!))
     }

@@ -19,6 +19,7 @@ final class WindowManager {
         switch DeepLink.parse(url) {
         case let .day(date): showDay(date)
         case .grid: showGrid()
+        case .update: DataStore.shared.updateNow()
         case nil: break
         }
     }

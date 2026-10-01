@@ -12,7 +12,7 @@ Columns are weeks (oldest on the left, this week on the right), rows run Sunday 
 
 | The day's usage, as f = usage ÷ 14.29% | The square |
 |---|---|
-| Before the first usage reading ever recorded | dark battery: 3 sections in `#24262b`, a shade darker than an empty one (no data yet) |
+| Before the first usage reading ever recorded | looks like an empty battery; the tooltip and day view say "no data yet" |
 | f = 0 | empty battery: 3 unfilled sections |
 | 0 < f ≤ ⅓ | 1 section filled |
 | ⅓ < f ≤ ⅔ | 2 sections filled |
@@ -24,8 +24,10 @@ Columns are weeks (oldest on the left, this week on the right), rows run Sunday 
 |---|---|---|---|---|
 | Filled section color | `#FDE5D2` | `#FAB27E` | `#F07A2A` | `#CC5500` |
 
-Unfilled sections are `#2e3037`, and the thin dividers show the widget's background (`#17181c`).
+Unfilled sections are `#2e3037`, and the thin dividers show the widget's background (`#17181c`). Days are 4 pt apart.
 
 **When macOS drains the widget's color** (a window in front, or a monochrome or tinted widget style), the widget keeps its meaning through brightness alone. Filled sections are clearly brighter than unfilled ones, and brighter with more sessions.
+
+**Update Now** (top of the grid window, or ⌘U in the menu bar menu) takes a fresh usage reading, which is one tiny Claude call, and refreshes your sessions. Otherwise sessions update on their own within seconds, and usage is read automatically once a day.
 
 The thresholds live in `aggregator/aggregator-config.json`. To override them, copy it to `~/.claude-usage-grid/aggregator-config.json` and edit the copy. `section_thresholds` sets how many sections a day has.

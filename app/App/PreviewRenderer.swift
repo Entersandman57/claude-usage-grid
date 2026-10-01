@@ -9,13 +9,14 @@ import SwiftUI
 ///   grid-window.png, day-<date>.png           the app's windows with real data
 @MainActor
 enum PreviewRenderer {
-    // Approximate macOS widget sizes in points; the real widget measures itself.
+    // macOS widget sizes in points. Medium is measured on this Mac (the widget
+    // logs its size); large and extra large follow the same 164 pt / 16 pt grid.
     private static let widgetSizes: [(name: String, size: CGSize, header: Bool)] = [
-        ("medium", CGSize(width: 344, height: 160), false),
-        ("large", CGSize(width: 344, height: 356), true),
-        ("extralarge", CGSize(width: 712, height: 356), true),
+        ("medium", CGSize(width: 344, height: 164), false),
+        ("large", CGSize(width: 344, height: 344), true),
+        ("extralarge", CGSize(width: 704, height: 344), true),
     ]
-    private static let widgetPadding: CGFloat = 14
+    private static let widgetPadding = WidgetContent.padding
 
     static func render(to directory: URL) {
         try? FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)

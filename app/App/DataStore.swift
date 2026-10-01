@@ -123,19 +123,25 @@ final class DataStore: ObservableObject {
         }
     }
 
-    @Published private(set) var takingReading = false
+    @Published private(set) var updating = false
+    @Published private(set) var lastUpdatedAt: Date?
 
-    /// A manual meter reading (one tiny `claude -p` call). It doesn't use up the
-    /// day's automatic run; the new reading triggers a refresh like any other.
-    func takeReading() {
-        guard !takingReading else { return }
-        takingReading = true
+    /// "Update Now": a fresh usage reading (one tiny `claude -p` call, which
+    /// doesn't use up the day's automatic run), then the session backfill for new
+    /// sessions and titles, then a refresh that rebuilds the grid and the widget.
+    func updateNow() {
+        guard !updating else { return }
+        updating = true
         let dataDir = self.dataDir
         Task.detached(priority: .userInitiated) {
-            // A failed call exits non-zero; its reason is in meter-runs and the status list.
+            // Failures are recorded in meter-runs and shown in the status list.
             try? DataStore.run("/usr/bin/python3", [dataDir.appendingPathComponent("bin/meter.py").path, "--now"])
+            try? DataStore.run(dataDir.appendingPathComponent("venv/bin/python").path,
+                               [dataDir.appendingPathComponent("bin/backfill.py").path])
             await MainActor.run {
-                self.takingReading = false
+                self.updating = false
+                self.lastUpdatedAt = Date()
+                self.lastBackfill = Date()
                 self.refresh()
             }
         }
