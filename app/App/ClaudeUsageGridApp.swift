@@ -76,6 +76,11 @@ struct MenuContent: View {
 
     var body: some View {
         Text(store.summary)
+        if let chats = store.snapshot?.chats, chats.remind {
+            Button("Import Chats… (\(chats.importedThrough.map { "last through " + Format.mediumDay($0) } ?? "never imported"))") {
+                WindowManager.shared.chooseExport()
+            }
+        }
         Divider()
         Button("Open Grid…") { WindowManager.shared.showGrid() }
             .keyboardShortcut("g")

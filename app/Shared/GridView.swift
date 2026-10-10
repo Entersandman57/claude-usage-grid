@@ -1,4 +1,5 @@
 import SwiftUI
+import WidgetKit
 
 /// What a click or hover on a day does.
 enum GridInteraction {
@@ -17,6 +18,8 @@ struct GridView: View {
     var style: CellStyle = .color
     var interaction: GridInteraction = .none
     var maxBands = 3
+    /// A small chat bubble in the grid's empty top-left corner: chats need importing.
+    var showsChatReminder = false
 
     var body: some View {
         GeometryReader { proxy in
@@ -27,8 +30,8 @@ struct GridView: View {
             // Bands share a right edge (today's column). The block is centered on a
             // half-point boundary so the cells' 1 pt dividers stay on whole pixels.
             VStack(alignment: .trailing, spacing: GridLayout.bandSpacing) {
-                ForEach(Array(layout.bands(of: weeks).enumerated()), id: \.offset) { _, band in
-                    bandView(band, layout: layout)
+                ForEach(Array(layout.bands(of: weeks).enumerated()), id: \.offset) { index, band in
+                    bandView(band, layout: layout, isFirst: index == 0)
                 }
             }
             .frame(width: block.width, height: block.height, alignment: .topTrailing)
@@ -42,11 +45,20 @@ struct GridView: View {
         max(0, (value * 2).rounded(.down) / 2)
     }
 
-    private func bandView(_ weeks: [Week], layout: GridLayout) -> some View {
+    private func bandView(_ weeks: [Week], layout: GridLayout, isFirst: Bool) -> some View {
         let column = layout.cell + layout.gap
         return VStack(alignment: .leading, spacing: 0) {
-            HStack(spacing: 0) {
-                Color.clear.frame(width: GridLayout.dayLabelWidth, height: 1)
+            HStack(alignment: .top, spacing: 0) {
+                if isFirst && showsChatReminder {
+                    Image(systemName: "bubble.left.fill")
+                        .font(.system(size: 10))
+                        .foregroundStyle(style.fullColor ? Palette.levels[2] : Color.white)
+                        .widgetAccentable()
+                        .frame(width: GridLayout.dayLabelWidth, height: GridLayout.monthLabelHeight, alignment: .topLeading)
+                        .accessibilityLabel("Chats need importing")
+                } else {
+                    Color.clear.frame(width: GridLayout.dayLabelWidth, height: 1)
+                }
                 ForEach(weeks) { week in
                     Text(week.monthLabel ?? "")
                         .font(.system(size: 9))
@@ -154,7 +166,8 @@ struct WidgetContent: View {
             VStack(alignment: .leading, spacing: 6) {
                 if showsHeader { SummaryLine(snapshot: snapshot, style: style) }
                 GridView(days: snapshot.days, sectionCount: snapshot.sectionsPerCell, style: style,
-                         interaction: links ? .links : .none)
+                         interaction: links ? .links : .none,
+                         showsChatReminder: snapshot.chats?.remind == true)
             }
         } else {
             VStack(alignment: .leading, spacing: 4) {

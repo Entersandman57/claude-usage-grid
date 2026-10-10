@@ -315,7 +315,8 @@ final class DataStore: ObservableObject {
             }
             if let through = status.chatsImportedThrough {
                 let when = status.chatsImportedAt.map { " (last import \(Format.moment($0)))" } ?? ""
-                lines.append("Chats imported through \(Format.mediumDay(through))\(when)")
+                let stale = snapshot?.chats?.remind == true ? ": newer chats aren't counted yet" : ""
+                lines.append("Chats imported through \(Format.mediumDay(through))\(when)\(stale)")
             } else {
                 lines.append("Chats: not imported yet (drop your claude.ai export on the grid window)")
             }

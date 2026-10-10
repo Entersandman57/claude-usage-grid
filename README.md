@@ -88,7 +88,7 @@ Claude Code sessions are picked up automatically. Chats in claude.ai (or in the 
 2. Download **`conversations-000.zip`** from it (the other files aren't needed). Each link in the manifest works only once.
 3. Drop the ZIP onto the app's grid window, or click **Import claude.ai Export…** there or in the menu bar menu (⌘I). Dropping the manifest itself tells you which file to get.
 
-Only each chat's ID, title and the days it had messages are kept, in `~/.claude-usage-grid/chats.json`. Message text is never stored: the app imports from a temporary copy of the export and deletes it right away. You can delete the downloaded ZIP afterwards; it contains your full chats. The status list shows "Chats imported through <date>". Chats after that date aren't counted until you import a newer export. Re-importing is safe: chats are updated, and chats you've since deleted on claude.ai are kept. Chats that were opened but never had a message are skipped.
+Only each chat's ID, title and the days it had messages are kept, in `~/.claude-usage-grid/chats.json`. Message text is never stored: the app imports from a temporary copy of the export and deletes it right away. You can delete the downloaded ZIP afterwards; it contains your full chats. The status list shows "Chats imported through <date>". Chats after that date aren't counted until you import a newer export. Once your import is more than 7 days old (`chat_reminder_days` in `aggregator-config.json`), a small orange chat bubble appears in the widget's top-left corner, and the grid window and menu bar menu say so, with the Import button next to it. Newer exports may only cover recent chats; older chats from earlier imports are kept. Re-importing is safe: chats are updated, and chats you've since deleted on claude.ai are kept. Chats that were opened but never had a message are skipped.
 
 In the day view, **Open in Claude** opens a chat in the desktop app and **Open in Browser** opens `https://claude.ai/chat/<id>`.
 
@@ -123,7 +123,7 @@ Titles are your own titles or Claude's auto-generated ones; a session's first pr
 - **Readings are sparse with the desktop app.** Usage is read when the terminal CLI responds, once a day by the meter, and when you press Update Now. A day's usage is credited to the day of the reading that observed it: if the Mac is asleep through midnight, usage from late that day lands on the next reading's day, and if it's off at reading time, that day's usage lands on the next reading's day.
 - **Peak 5-hour %** is usually from a single reading when you only use the desktop app.
 - **Other machines and the cloud.** Sessions on other Macs and cloud sessions aren't counted, though their usage is in the %.
-- **Chats after your last import** aren't counted until the next import.
+- **Chats after your last import** aren't counted until the next import (the orange bubble reminds you after 7 days). There's no documented way to see claude.ai chats as they happen.
 - **Undocumented fields.** The meter reads both windows from the stream's `rate_limit_event` → `unifiedWindows`, which isn't documented and may change. If it does, the status list shows "no utilization in output" and the meter needs an update.
 - **Small manual resets.** A manual limit reset of less than 3 points looks like rounding noise and isn't treated as a reset.
 - **Widget refreshes.** macOS may delay widget updates; the app asks for one whenever the grid changes, and the widget also asks every 30 minutes and just after midnight.

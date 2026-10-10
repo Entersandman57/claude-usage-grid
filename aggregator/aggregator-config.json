@@ -6,5 +6,6 @@
   "level_window_days": 365,
   "reset_drop_threshold_pp": 3,
   "resets_at_tolerance_seconds": 3600,
-  "grid_weeks": 53
+  "grid_weeks": 53,
+  "chat_reminder_days": 7
 }

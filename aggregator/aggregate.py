@@ -249,6 +249,19 @@ def latest_window(readings, name):
     return None
 
 
+def chat_import_status(chats, today, config):
+    """How current the claude.ai import is. Chats after imported_through aren't
+    counted, so once it's more than chat_reminder_days old (or there's never been
+    an import) the widget and app remind you to import a newer export."""
+    through = chats.get("imported_through")
+    try:
+        days_since = (today - date.fromisoformat(through)).days if through else None
+    except ValueError:
+        days_since = None
+    return {"imported_through": through, "days_since": days_since,
+            "remind": days_since is None or days_since > config["chat_reminder_days"]}
+
+
 def build(inputs, today, config, generated_at):
     readings = inputs["readings"]
     usage = {d: u for d, u in weekly_usage_by_day(readings, config).items() if d <= today}
@@ -311,6 +324,7 @@ def build(inputs, today, config, generated_at):
         "version": SNAPSHOT_VERSION, "generated_at": generated_at, "today": today.isoformat(),
         "week_start": "sunday", "usage_tracked_since": usage_since.isoformat() if usage_since else None,
         "section_count": len(config["section_thresholds"]) + 1,
+        "chats": chat_import_status(inputs["chats"], today, config),
         "header": header, "levels": levels, "days": grid,
     }
 

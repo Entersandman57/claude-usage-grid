@@ -304,6 +304,19 @@ def test_header_and_usage_known(new_york):
                                     "level": 1, "usage_known": True}
 
 
+@pytest.mark.parametrize("through, days_since, remind", [
+    (None, None, True),                 # never imported
+    ("2026-09-30", 0, False),
+    ("2026-09-23", 7, False),           # exactly a week: not yet
+    ("2026-09-22", 8, True),
+    ("garbage", None, True),
+])
+def test_chat_import_reminder(new_york, through, days_since, remind):
+    chats = {"imported_through": through, "chats": {}} if through else None
+    snapshot, _ = build(date(2026, 9, 30), chats=chats)
+    assert snapshot["chats"] == {"imported_through": through, "days_since": days_since, "remind": remind}
+
+
 def test_user_config_overrides_thresholds(grid_home):
     grid_home.mkdir(parents=True)
     (grid_home / "aggregator-config.json").write_text(json.dumps({"section_thresholds": [0.1, 0.2, 0.3]}))

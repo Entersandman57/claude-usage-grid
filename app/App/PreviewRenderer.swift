@@ -40,6 +40,16 @@ enum PreviewRenderer {
                 }
             }
         }
+        // The chat-import reminder (the bubble in the grid's top-left corner).
+        var reminder = Snapshot.sample(trackedWeeks: 16)
+        reminder.chats = ChatImportStatus(importedThrough: "2026-09-30", daysSince: 10, remind: true)
+        write(WidgetContent(snapshot: reminder, showsHeader: false, links: false)
+                .padding(widgetPadding)
+                .frame(width: 344, height: 164)
+                .background(Palette.background)
+                .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
+                .environment(\.colorScheme, .dark),
+              "widget-sample-medium-chat-reminder.png", in: directory)
         for fullColor in [true, false] {
             let style = CellStyle(fullColor: fullColor)
             let sheet = VStack(alignment: .leading, spacing: 24) {

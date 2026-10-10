@@ -10,12 +10,29 @@ struct Snapshot: Codable, Equatable {
     var today: String
     var usageTrackedSince: String?
     var sectionCount: Int?
+    var chats: ChatImportStatus?
     var header: Header
     var levels: Levels
     var days: [GridDay]
 
     /// Battery sections per cell (section_thresholds + 1 in the aggregator config).
     var sectionsPerCell: Int { max(1, sectionCount ?? 3) }
+}
+
+/// How current the claude.ai chat import is; `remind` once it's older than
+/// chat_reminder_days (or there has never been an import).
+struct ChatImportStatus: Codable, Equatable {
+    var importedThrough: String?
+    var daysSince: Int?
+    var remind: Bool
+
+    var reminderText: String {
+        guard let through = importedThrough else {
+            return "No claude.ai chats imported yet, so chats aren't counted. Import your data export."
+        }
+        let ago = daysSince.map { $0 == 1 ? " (1 day ago)" : " (\($0) days ago)" } ?? ""
+        return "Chats are imported through \(Format.mediumDay(through))\(ago). Newer chats aren't counted until you import a newer export."
+    }
 }
 
 struct Header: Codable, Equatable {

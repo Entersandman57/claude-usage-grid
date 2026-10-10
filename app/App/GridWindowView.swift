@@ -17,11 +17,18 @@ struct GridWindowView: View {
                     UpdateButton(store: store)
                 }
                 .frame(height: 24)  // fixed so the grid below starts on a whole point
+                if let chats = snapshot.chats, chats.remind {
+                    Label(chats.reminderText, systemImage: "bubble.left.fill")
+                        .font(.callout)
+                        .foregroundStyle(Palette.levels[1])
+                        .frame(height: 18)
+                }
                 GridView(days: snapshot.days, sectionCount: snapshot.sectionsPerCell,
                          interaction: .interactive(hovered: $hovered,
                                                    open: { WindowManager.shared.showDay($0) },
                                                    tooltip: store.tooltip(for:)),
-                         maxBands: 1)
+                         maxBands: 1,
+                         showsChatReminder: snapshot.chats?.remind == true)
                     .frame(height: GridLayout.bandHeight(cell: 15.5, gap: GridLayout.cellGap))
                 Text(hoverText(snapshot))
                     .font(.callout)
