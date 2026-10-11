@@ -33,8 +33,11 @@ def inputs(readings=(), activity=(), sessions=None, chats=None):
             "sessions": sessions or {}, "sessions_updated_at": None, "chats": chats or {}, "meter_state": {}}
 
 
-def build(today, **kw):
-    return aggregate.build(inputs(**kw), today, CONFIG, generated_at=0)
+SESSIONS = dict(CONFIG, level_source="sessions")  # the orange from session counts instead
+
+
+def build(today, config=CONFIG, **kw):
+    return aggregate.build(inputs(**kw), today, config, generated_at=0)
 
 
 # --- plan usage ----------------------------------------------------------------------------
@@ -229,9 +232,30 @@ def days_with(counts, end=date(2026, 9, 30)):
     return activity
 
 
+@pytest.mark.parametrize("peak, used, level", [
+    (73, 16, 3), (98, 24, 4), (52, 20, 3), (21, 5, 1), (25, 3, 1), (25.5, 3, 2), (75, 3, 3), (75.5, 3, 4),
+    (2, 12, 1),       # a busy day whose only reading came after its 5-hour window reset
+    (None, 3, 1),     # usage but no 5-hour reading: lightest orange
+    (0, 3, 1),
+    (0, 0, 0), (None, 0, 0),
+])
+def test_five_hour_level(peak, used, level):
+    assert aggregate.five_hour_level(peak, used, [25, 50, 75]) == level
+
+
+def test_orange_follows_the_peak_five_hour(new_york):
+    readings = [r((2026, 10, 9, 23, 55), 20, five=21), r((2026, 10, 10, 1, 45), 25, five=52),
+                r((2026, 10, 10, 23, 55), 40, five=10)]
+    activity = [act((2026, 10, 10, 12, 0), "s%d" % i) for i in range(9)]  # many sessions don't matter now
+    snapshot, details = build(date(2026, 10, 10), readings=readings, activity=activity)
+    today = details["days"]["2026-10-10"]
+    assert (today["peak_five_hour_pct"], today["level"], today["sessions"]) == (52.0, 3, 9)
+    assert snapshot["levels"] == {"mode": "five_hour", "thresholds": [25, 50, 75], "nonzero_days": 2}
+
+
 def test_fixed_buckets_until_14_nonzero_days(new_york):
     counts = [1, 2, 3, 4, 6, 7, 12, 1, 1, 1, 1, 1, 1]  # 13 non-zero days
-    _, details = build(date(2026, 9, 30), activity=days_with(counts))
+    _, details = build(date(2026, 9, 30), SESSIONS, activity=days_with(counts))
     assert details["levels"] == {"mode": "fixed", "thresholds": [1, 3, 6], "nonzero_days": 13}
     levels = [details["days"][(date(2026, 9, 30) - timedelta(days=i)).isoformat()]["level"] for i in range(7)]
     assert levels == [1, 2, 2, 3, 3, 4, 4]
@@ -239,7 +263,7 @@ def test_fixed_buckets_until_14_nonzero_days(new_york):
 
 def test_quartiles_once_there_are_14_nonzero_days(new_york):
     counts = [1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 8, 10]
-    _, details = build(date(2026, 9, 30), activity=days_with(counts))
+    _, details = build(date(2026, 9, 30), SESSIONS, activity=days_with(counts))
     assert details["levels"]["mode"] == "quartiles"
     assert details["levels"]["thresholds"] == [2.25, 4.0, 5.75]
     by_count = {n: details["days"][(date(2026, 9, 30) - timedelta(days=i)).isoformat()]["level"]
@@ -250,7 +274,7 @@ def test_quartiles_once_there_are_14_nonzero_days(new_york):
 def test_quartiles_never_collapse(new_york):
     # The real history on 2026-09-30: 31 one-session days, 6 two, 2 three, 1 ten.
     counts = [10] + [1] * 31 + [2] * 6 + [3] * 2
-    _, details = build(date(2026, 9, 30), activity=days_with(counts))
+    _, details = build(date(2026, 9, 30), SESSIONS, activity=days_with(counts))
     assert details["levels"] == {"mode": "quartiles", "thresholds": [1.0, 2.0, 3.0], "nonzero_days": 40}
     by_count = {n: details["days"][(date(2026, 9, 30) - timedelta(days=i)).isoformat()]["level"]
                 for i, n in enumerate(counts)}
@@ -260,7 +284,7 @@ def test_quartiles_never_collapse(new_york):
 def test_quartiles_only_use_the_trailing_365_days(new_york):
     old = days_with([9] * 20, end=date(2025, 9, 1))   # over a year before "today"
     recent = days_with([1] * 5)
-    _, details = build(date(2026, 9, 30), activity=old + recent)
+    _, details = build(date(2026, 9, 30), SESSIONS, activity=old + recent)
     assert details["levels"]["mode"] == "fixed" and details["levels"]["nonzero_days"] == 5
 
 
@@ -269,7 +293,7 @@ def test_quartiles_only_use_the_trailing_365_days(new_york):
 def test_empty_history(new_york):
     snapshot, details = build(date(2026, 9, 30))
     assert details["days"] == {}
-    assert snapshot["levels"] == {"mode": "fixed", "thresholds": [1, 3, 6], "nonzero_days": 0}
+    assert snapshot["levels"] == {"mode": "five_hour", "thresholds": [25, 50, 75], "nonzero_days": 0}
     assert all(d["sections"] == 0 and d["level"] == 0 and not d["usage_known"] for d in snapshot["days"])
     assert snapshot["header"] == {"week": None, "five_hour": None, "today_usage_pp": 0, "today_sessions": 0}
     assert snapshot["usage_tracked_since"] is None

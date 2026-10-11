@@ -2,7 +2,7 @@
 
 > **This project is vibe coded.** It was written by Claude (Anthropic's AI) in Claude Code, from my spec and feedback, with me testing it on my own Mac. I didn't write the code by hand. Treat it as a personal project, not reviewed production software.
 
-A macOS desktop widget, styled like GitHub's contribution graph, that charts your daily Claude usage. Each day is a little battery: how much of your weekly plan limit you used, filled in the orange that shows how many sessions you had. A menu bar app hosts it, with a full-year grid window and a view of each day's sessions and chats.
+A macOS desktop widget, styled like GitHub's contribution graph, that charts your daily Claude usage. Each day is a little battery: how much of your weekly plan limit you used, filled in an orange that shows how close you came to your 5-hour limit. A menu bar app hosts it, with a full-year grid window and a view of each day's sessions and chats.
 
 ![The medium widget, with made-up sample data](docs/widget-medium-sample.png)
 
@@ -44,11 +44,13 @@ Columns are weeks (oldest on the left, this week on the right), rows run Sunday 
 | ⅓ < f ≤ ⅔ | 2 sections filled |
 | f > ⅔ | 3 sections filled |
 
-**The orange shows how many sessions you had** (Claude Code sessions plus claude.ai chats). Fewer sessions are a light, whitish orange; more are a deep, vivid orange. Levels are quartiles of your own days with sessions over the last year, with each level at least one session above the one before (so a history of mostly 1-session days still uses all four shades). Until you have 14 such days, fixed buckets are used: 1, 2–3, 4–6, and 7 or more sessions.
+**The orange shows how close you came to your 5-hour limit that day**: the highest 5-hour % among that day's readings. A light, whitish orange means you stayed well under it; a deep, vivid orange means you nearly hit it.
 
-| Level | 1 | 2 | 3 | 4 |
+| Peak 5-hour % that day | up to 25% | up to 50% | up to 75% | above 75% |
 |---|---|---|---|---|
 | Filled section color | `#FDE5D2` | `#FAB27E` | `#F07A2A` | `#CC5500` |
+
+A day with usage but no 5-hour reading gets the lightest orange. The peak is only as good as the readings behind it; see [Known limitations](#known-limitations). To color by session count instead (Claude Code sessions plus claude.ai chats, ranked against your own history), set `"level_source": "sessions"` in the config.
 
 Unfilled sections are `#2e3037`, and the thin dividers show the widget's background (`#17181c`). Days are 4 pt apart.
 
@@ -78,7 +80,7 @@ The thresholds live in `aggregator/aggregator-config.json`. To override them, co
 - claude.ai chats with at least one message that day, from your imported export.
 - A session that spans several days counts on each of them. A day with usage but no known session counts as 1.
 
-**Levels** are described above. They're recomputed from the trailing 365 days every time the grid updates.
+**The orange** comes from the day's peak 5-hour %, in fixed quarters of the 5-hour limit (`five_hour_level_thresholds`: 25, 50, 75). With `"level_source": "sessions"`, it comes from session counts instead: quartiles of your days with sessions over the last 365 days, each at least one session above the previous one, and fixed buckets (1, 2–3, 4–6, 7+) until you have 14 such days. Sessions always show in tooltips, the day view and the large widget's header.
 
 ## Importing your claude.ai chats
 
@@ -88,7 +90,7 @@ Claude Code sessions are picked up automatically. Chats in claude.ai (or in the 
 2. Download **`conversations-000.zip`** from it (the other files aren't needed). Each link in the manifest works only once.
 3. Drop the ZIP onto the app's grid window, or click **Import claude.ai Export…** there or in the menu bar menu (⌘I). Dropping the manifest itself tells you which file to get.
 
-Only each chat's ID, title and the days it had messages are kept, in `~/.claude-usage-grid/chats.json`. Message text is never stored: the app imports from a temporary copy of the export and deletes it right away. You can delete the downloaded ZIP afterwards; it contains your full chats. The status list shows "Chats imported through <date>". Chats after that date aren't counted until you import a newer export. Once your import is more than 7 days old (`chat_reminder_days` in `aggregator-config.json`), a small orange chat bubble appears in the widget's top-left corner, and the grid window and menu bar menu say so, with the Import button next to it. Newer exports may only cover recent chats; older chats from earlier imports are kept. Re-importing is safe: chats are updated, and chats you've since deleted on claude.ai are kept. Chats that were opened but never had a message are skipped.
+Only each chat's ID, title and the days it had messages are kept, in `~/.claude-usage-grid/chats.json`. Message text is never stored: the app imports from a temporary copy of the export and deletes it right away. You can delete the downloaded ZIP afterwards; it contains your full chats. The status list shows "Chats imported through <date>". Chats after that date aren't counted until you import a newer export. Chats count toward the session numbers (tooltips, day view, the large widget's header), not the orange. Once your import is more than 7 days old (`chat_reminder_days` in `aggregator-config.json`), a small orange chat bubble appears in the widget's top-left corner, and the grid window and menu bar menu say so, with the Import button next to it. Newer exports may only cover recent chats; older chats from earlier imports are kept. Re-importing is safe: chats are updated, and chats you've since deleted on claude.ai are kept. Chats that were opened but never had a message are skipped.
 
 In the day view, **Open in Claude** opens a chat in the desktop app and **Open in Browser** opens `https://claude.ai/chat/<id>`.
 
@@ -121,7 +123,7 @@ Titles are your own titles or Claude's auto-generated ones; a session's first pr
 
 - **History starts at install.** Plan usage is only known from the first reading, so earlier days look like empty batteries (with any sessions and chats listed when you hover or open them). Claude Code sessions backfill as far as transcripts exist (about 30 days by default); chats go back as far as your export.
 - **Readings are sparse with the desktop app.** Usage is read when the terminal CLI responds, once a day by the meter, and when you press Update Now. A day's usage is credited to the day of the reading that observed it: if the Mac is asleep through midnight, usage from late that day lands on the next reading's day, and if it's off at reading time, that day's usage lands on the next reading's day.
-- **Peak 5-hour %** is usually from a single reading when you only use the desktop app.
+- **Peak 5-hour % is sampled.** It's the highest 5-hour % among the day's readings, so with only the nightly reading it shows the 5-hour window at 11:55 PM, which may have reset hours after your busiest stretch. A busy day can then get a light orange (Oct 8, 2026: 12 points of the week used, one reading at 2%). Each Update Now adds a sample.
 - **Other machines and the cloud.** Sessions on other Macs and cloud sessions aren't counted, though their usage is in the %.
 - **Chats after your last import** aren't counted until the next import (the orange bubble reminds you after 7 days). There's no documented way to see claude.ai chats as they happen.
 - **Undocumented fields.** The meter reads both windows from the stream's `rate_limit_event` → `unifiedWindows`, which isn't documented and may change. If it does, the status list shows "no utilization in output" and the meter needs an update.

@@ -34,7 +34,7 @@ struct GridWindowView: View {
                     .font(.callout)
                     .foregroundStyle(hovered == nil ? .secondary : .primary)
                     .frame(height: 18)  // fixed heights keep the cells below on whole pixels
-                LegendView(sectionCount: snapshot.sectionsPerCell)
+                LegendView(sectionCount: snapshot.sectionsPerCell, levels: snapshot.levels)
                 if let message = store.importMessage {
                     Text(message).font(.callout).frame(height: 18)
                 }
@@ -81,6 +81,7 @@ struct GridWindowView: View {
 
 struct LegendView: View {
     let sectionCount: Int
+    let levels: Levels
 
     private func cell(sections: Int, level: Int) -> some View {
         DayCell(day: GridDay(date: "", usagePp: 0, sections: sections, sessions: level, level: level, usageKnown: true),
@@ -89,10 +90,22 @@ struct LegendView: View {
 
     var body: some View {
         HStack(spacing: 20) {
-            HStack(spacing: 4) {
-                Text("Sessions: fewer")
-                ForEach(1...4, id: \.self) { cell(sections: sectionCount, level: $0) }
-                Text("more")
+            if levels.mode == "five_hour" {
+                HStack(spacing: 4) {
+                    Text("Orange = peak 5-hour usage:")
+                    ForEach(1...4, id: \.self) { level in
+                        cell(sections: sectionCount, level: level)
+                        Text(level <= levels.thresholds.count
+                             ? "≤\(Format.percent(levels.thresholds[level - 1]))"
+                             : ">\(Format.percent(levels.thresholds.last ?? 75))")
+                    }
+                }
+            } else {
+                HStack(spacing: 4) {
+                    Text("Sessions: fewer")
+                    ForEach(1...4, id: \.self) { cell(sections: sectionCount, level: $0) }
+                    Text("more")
+                }
             }
             HStack(spacing: 4) {
                 Text("Weekly limit used that day:")

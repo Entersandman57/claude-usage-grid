@@ -225,13 +225,24 @@ def level_thresholds(totals, today, config):
     return "quartiles", [round(t, 4) for t in thresholds], len(nonzero)
 
 
-def level_for(sessions, thresholds):
-    if sessions <= 0:
+def level_for(value, thresholds):
+    """0 for nothing, else 1 + how many thresholds the value exceeds."""
+    if value <= 0:
         return 0
     for level, threshold in enumerate(thresholds, start=1):
-        if sessions <= threshold:
+        if value <= threshold:
             return level
     return len(thresholds) + 1
+
+
+def five_hour_level(peak, used, thresholds):
+    """Orange from the day's peak 5-hour %: fixed quarters of the 5-hour limit
+    (with the default thresholds, <=25% is 1, <=50% 2, <=75% 3, above 4). A day
+    with usage but no 5-hour reading above 0 is level 1, so its sections still
+    get the lightest orange."""
+    if peak is not None and peak > 0:
+        return level_for(peak, thresholds)
+    return 1 if used > EPSILON else 0
 
 
 # --- output --------------------------------------------------------------------------------
@@ -288,9 +299,18 @@ def build(inputs, today, config, generated_at):
             "chats": sorted(chats.get(day, {}).values(), key=lambda c: c["title"] or ""),
         }
 
-    mode, thresholds, nonzero_days = level_thresholds(totals, today, config)
-    for detail in detail_days.values():
-        detail["level"] = level_for(detail["sessions"], thresholds)
+    # level_source decides the orange: "five_hour" (the day's peak 5-hour %) or
+    # "sessions" (session counts, ranked against your history).
+    if config["level_source"] == "five_hour":
+        thresholds = list(config["five_hour_level_thresholds"])
+        mode = "five_hour"
+        nonzero_days = sum(1 for detail in detail_days.values() if (detail["peak_five_hour_pct"] or 0) > 0)
+        for detail in detail_days.values():
+            detail["level"] = five_hour_level(detail["peak_five_hour_pct"], detail["usage_pp"], thresholds)
+    else:
+        mode, thresholds, nonzero_days = level_thresholds(totals, today, config)
+        for detail in detail_days.values():
+            detail["level"] = level_for(detail["sessions"], thresholds)
 
     # Days before the first weekly reading ever recorded have no usage data: the
     # grid draws them as a battery in the darker no-data color, unlike a tracked
