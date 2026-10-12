@@ -101,7 +101,7 @@ struct LegendView: View {
                 let rule = snapshot.afterburner ?? .standard
                 cell(sections: sectionCount, level: 4, afterburner: true)
                     .padding(.trailing, 2)
-                Text("Afterburner: a 5-hour window maxed out (\(Format.percent(rule.maxedPct))) and another went over \(Format.percent(rule.otherPct)) the same day")
+                Text("Afterburner: in one day, a 5-hour window maxed out and another went over \(Format.percent(rule.otherPct)), or one went over \(Format.percent(rule.high)) and a later one over \(Format.percent(rule.next))")
             }
             .frame(height: 16)
         }

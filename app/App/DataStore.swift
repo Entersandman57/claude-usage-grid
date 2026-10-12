@@ -295,7 +295,9 @@ final class DataStore: ObservableObject {
         if let detail, let peak = detail.peakFiveHourPct {
             parts.append("peak 5h \(Format.percent(peak))" + (detail.fiveHourSamples == 1 ? " (1 reading)" : ""))
         }
-        if let afterburner = detail?.afterburnerText { parts.append("🔥 " + afterburner) }
+        if let afterburner = detail?.afterburnerText(rule: snapshot?.afterburner ?? .standard) {
+            parts.append("🔥 " + afterburner)
+        }
         return parts.joined(separator: " · ")
     }
 

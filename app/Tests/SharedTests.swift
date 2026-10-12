@@ -33,7 +33,7 @@ final class SharedTests: XCTestCase {
     func testDecodesBatteryRuleAndAfterburner() throws {
         let json = """
         {"battery": {"source": "sessions", "thresholds": [1, 4]},
-         "afterburner": {"maxed_pct": 100, "other_pct": 10},
+         "afterburner": {"maxed_pct": 100, "other_pct": 10, "high_pct": 80, "next_pct": 21},
          "day": {"date": "2026-10-10", "usage_pp": 20, "sections": 3, "sessions": 9, "level": 4,
                  "usage_known": true, "afterburner": true},
          "detail": {"usage_pp": 20, "share_fraction": 1.4, "sections": 3, "peak_five_hour_pct": 100,
@@ -53,7 +53,7 @@ final class SharedTests: XCTestCase {
         XCTAssertEqual(parts.afterburner, .standard)
         XCTAssertEqual(parts.day.afterburner, true)
         XCTAssertEqual(parts.detail.fiveHourWindows?.map(\.peakPct), [100, 31])
-        XCTAssertEqual(parts.detail.afterburnerText, "Maxed out a 5-hour window, then used 31% of another")
+        XCTAssertEqual(parts.detail.afterburnerText(rule: .standard), "Maxed out a 5-hour window and used 31% of another")
 
         // A version 2 snapshot (no battery rule, no afterburner) still decodes.
         let old = try GridJSON.decoder().decode(Snapshot.self, from: fixture("snapshot"))
@@ -70,9 +70,16 @@ final class SharedTests: XCTestCase {
         var detail = try! GridJSON.decoder().decode(Details.self, from: fixture("details")).days["2026-09-30"]!
         detail.fiveHourWindows = [FiveHourWindow(resetsAt: 1, peakPct: 100, samples: 1),
                                   FiveHourWindow(resetsAt: 2, peakPct: 100, samples: 1)]
-        XCTAssertNil(detail.afterburnerText)
+        XCTAssertNil(detail.afterburnerText(rule: .standard))
         detail.afterburner = true
-        XCTAssertEqual(detail.afterburnerText, "Maxed out two 5-hour windows")
+        XCTAssertEqual(detail.afterburnerText(rule: .standard), "Maxed out two 5-hour windows")
+        detail.fiveHourWindows = [FiveHourWindow(resetsAt: 1, peakPct: 98, samples: 2),
+                                  FiveHourWindow(resetsAt: 2, peakPct: 1, samples: 1),
+                                  FiveHourWindow(resetsAt: 3, peakPct: 90, samples: 1)]
+        XCTAssertEqual(detail.afterburnerText(rule: .standard), "Hit 98% of a 5-hour window, then 90% of a later one")
+        // A snapshot from before the second rule falls back to 80% / 21%.
+        let older = AfterburnerRule(maxedPct: 100, otherPct: 10)
+        XCTAssertEqual([older.high, older.next], [80, 21])
     }
 
     // MARK: Weeks

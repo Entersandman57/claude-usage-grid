@@ -143,7 +143,7 @@ def test_battery_fills_with_sessions(new_york):
     activity = [act((2026, 9, 30, 12, 0), "s%d" % i) for i in range(3)]  # ... with 3 sessions
     snapshot, details = build(date(2026, 9, 30), readings=readings, activity=activity)
     assert snapshot["battery"] == {"source": "sessions", "thresholds": [1, 4]}
-    assert snapshot["afterburner"] == {"maxed_pct": 100, "other_pct": 10}
+    assert snapshot["afterburner"] == {"maxed_pct": 100, "other_pct": 10, "high_pct": 80, "next_pct": 21}
     assert snapshot["section_count"] == 3
     assert (snapshot["days"][-1]["sections"], details["days"]["2026-09-30"]["usage_pp"]) == (2, 35.0)
 
@@ -328,9 +328,19 @@ def windows_of(*peaks):
     ((100, 10.5), True),
     ((100, 10), False),      # the other window must be over 10%
     ((100,), False),         # maxed out once and stopped
-    ((99, 60), False),       # close isn't maxed
     ((60, 80, 40), False),
     ((), False),
+    # over 80%, then a later window over 21%
+    ((85, 30), True),
+    ((99, 60), True),
+    ((80.5, 21.5), True),
+    ((80, 30), False),       # must be over 80%
+    ((85, 21), False),       # the next must be over 21%
+    ((30, 85), False),       # the high window has to come first
+    ((85, 5, 30), True),     # a near-empty window in between doesn't break it
+    ((10, 85, 22), True),
+    ((98, 1, 8), False),     # Oct 11, 2026 at 9 PM ...
+    ((98, 1, 90), True),     # ... and at midnight
 ])
 def test_is_afterburner(peaks, expected):
     assert aggregate.is_afterburner(windows_of(*peaks), CONFIG) is expected

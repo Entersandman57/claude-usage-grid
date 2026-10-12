@@ -43,12 +43,19 @@ struct BatteryRule: Codable, Equatable {
     }
 }
 
-/// The afterburner glow: a 5-hour window at maxedPct and another above otherPct the same day.
+/// The afterburner glow, on a day whose 5-hour windows show either
+/// a window at maxedPct and another above otherPct, or
+/// a window above highPct and a later one above nextPct.
 struct AfterburnerRule: Codable, Equatable {
     var maxedPct: Double
     var otherPct: Double
+    var highPct: Double?  // nil in snapshots from before the second rule
+    var nextPct: Double?
 
-    static let standard = AfterburnerRule(maxedPct: 100, otherPct: 10)
+    var high: Double { highPct ?? 80 }
+    var next: Double { nextPct ?? 21 }
+
+    static let standard = AfterburnerRule(maxedPct: 100, otherPct: 10, highPct: 80, nextPct: 21)
 }
 
 /// How current the claude.ai chat import is; `remind` once it's older than
@@ -133,16 +140,22 @@ struct FiveHourWindow: Codable, Equatable {
 }
 
 extension DayDetail {
-    /// "Maxed out a 5-hour window, then used 31% of another", or nil if not an afterburner day.
-    var afterburnerText: String? {
-        guard afterburner == true, let windows = fiveHourWindows,
-              let maxed = windows.max(by: { $0.peakPct < $1.peakPct }) else { return nil }
-        let others = windows.filter { $0 != maxed }
-        if others.contains(where: { $0.peakPct >= maxed.peakPct }) {
-            return "Maxed out two 5-hour windows"
+    /// Why the day glows ("Hit 98% of a 5-hour window, then 90% of a later one"), or nil if it doesn't.
+    func afterburnerText(rule: AfterburnerRule) -> String? {
+        guard afterburner == true, let windows = fiveHourWindows else { return nil }
+        let maxed = windows.filter { $0.peakPct >= rule.maxedPct }
+        if maxed.count >= 2 { return "Maxed out two 5-hour windows" }
+        if let full = maxed.first, let other = windows.filter({ $0 != full }).map(\.peakPct).max(),
+           other > rule.otherPct {
+            return "Maxed out a 5-hour window and used \(Format.percent(other)) of another"
         }
-        let other = others.map(\.peakPct).max() ?? 0
-        return "Maxed out a 5-hour window, then used \(Format.percent(other)) of another"
+        let ordered = windows.sorted { $0.resetsAt < $1.resetsAt }
+        for (index, window) in ordered.enumerated() where window.peakPct > rule.high {
+            if let later = ordered[(index + 1)...].map(\.peakPct).max(), later > rule.next {
+                return "Hit \(Format.percent(window.peakPct)) of a 5-hour window, then \(Format.percent(later)) of a later one"
+            }
+        }
+        return "Kept going past a near-limit 5-hour window"
     }
 }
 

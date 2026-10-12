@@ -30,7 +30,7 @@ struct DayContent: View {
                 Text(Format.longDay(date)).font(.title2.weight(.semibold))
             }
             .frame(height: 35)  // keeps the cell on whole pixels
-            if let afterburner = detail?.afterburnerText {
+            if let afterburner = detail?.afterburnerText(rule: store.snapshot?.afterburner ?? .standard) {
                 Label(afterburner + ": afterburner day.", systemImage: "flame.fill")
                     .font(.callout.weight(.semibold))
                     .foregroundStyle(Palette.afterburnerGlow)

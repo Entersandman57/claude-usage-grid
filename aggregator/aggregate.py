@@ -148,11 +148,20 @@ def five_hour_windows_by_day(readings, config):
 
 
 def is_afterburner(windows, config):
-    """True if a 5-hour window hit its limit (afterburner_maxed_pct) and another
-    window that day went past afterburner_other_pct: you maxed out and kept going."""
+    """True if the day's 5-hour windows show you working past a near-limit window:
+      * one hit its limit (afterburner_maxed_pct) and another went over
+        afterburner_other_pct (either order), or
+      * one went over afterburner_high_pct and a later window that day went
+        over afterburner_next_pct. Any later window counts, so a near-empty
+        window in between (one a meter call started, say) doesn't break it."""
     maxed = [w for w in windows if w["peak_pct"] >= config["afterburner_maxed_pct"] - EPSILON]
-    return any(other is not window and other["peak_pct"] > config["afterburner_other_pct"]
-               for window in maxed for other in windows)
+    if any(other is not window and other["peak_pct"] > config["afterburner_other_pct"]
+           for window in maxed for other in windows):
+        return True
+    ordered = sorted(windows, key=lambda w: w["resets_at"])
+    return any(window["peak_pct"] > config["afterburner_high_pct"]
+               and any(later["peak_pct"] > config["afterburner_next_pct"] for later in ordered[i + 1:])
+               for i, window in enumerate(ordered))
 
 
 def battery_thresholds(config):
@@ -395,7 +404,8 @@ def build(inputs, today, config, generated_at):
         "week_start": "sunday", "usage_tracked_since": usage_since.isoformat() if usage_since else None,
         "section_count": len(section_thresholds) + 1,
         "battery": {"source": section_source, "thresholds": section_thresholds},
-        "afterburner": {"maxed_pct": config["afterburner_maxed_pct"], "other_pct": config["afterburner_other_pct"]},
+        "afterburner": {"maxed_pct": config["afterburner_maxed_pct"], "other_pct": config["afterburner_other_pct"],
+                        "high_pct": config["afterburner_high_pct"], "next_pct": config["afterburner_next_pct"]},
         "chats": chat_import_status(inputs["chats"], today, config),
         "header": header, "levels": levels, "days": grid,
     }
