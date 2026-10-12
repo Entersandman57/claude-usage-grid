@@ -34,7 +34,7 @@ struct GridWindowView: View {
                     .font(.callout)
                     .foregroundStyle(hovered == nil ? .secondary : .primary)
                     .frame(height: 18)  // fixed heights keep the cells below on whole pixels
-                LegendView(sectionCount: snapshot.sectionsPerCell, levels: snapshot.levels)
+                LegendView(snapshot: snapshot)
                 if let message = store.importMessage {
                     Text(message).font(.callout).frame(height: 18)
                 }
@@ -80,16 +80,60 @@ struct GridWindowView: View {
 }
 
 struct LegendView: View {
-    let sectionCount: Int
-    let levels: Levels
+    let snapshot: Snapshot
 
-    private func cell(sections: Int, level: Int) -> some View {
-        DayCell(day: GridDay(date: "", usagePp: 0, sections: sections, sessions: level, level: level, usageKnown: true),
+    private var sectionCount: Int { snapshot.sectionsPerCell }
+    private var levels: Levels { snapshot.levels }
+
+    private func cell(sections: Int, level: Int, afterburner: Bool = false) -> some View {
+        DayCell(day: GridDay(date: "", usagePp: 0, sections: sections, sessions: level, level: level, usageKnown: true,
+                             afterburner: afterburner),
                 size: 14, style: .color, sectionCount: sectionCount)
     }
 
     var body: some View {
-        HStack(spacing: 20) {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 20) {
+                battery
+                orange
+            }
+            HStack(spacing: 4) {
+                let rule = snapshot.afterburner ?? .standard
+                cell(sections: sectionCount, level: 4, afterburner: true)
+                    .padding(.trailing, 2)
+                Text("Afterburner: a 5-hour window maxed out (\(Format.percent(rule.maxedPct))) and another went over \(Format.percent(rule.otherPct)) the same day")
+            }
+            .frame(height: 16)
+        }
+        .font(.caption)
+        .foregroundStyle(.secondary)
+    }
+
+    @ViewBuilder
+    private var battery: some View {
+        if snapshot.batteryCountsSessions {
+            let labels = snapshot.battery?.sessionLabels ?? ["0", "1", "2–4", "5+"]
+            HStack(spacing: 4) {
+                Text("Bars = sessions that day:")
+                ForEach(0...sectionCount, id: \.self) { sections in
+                    cell(sections: sections, level: 3)
+                    if sections < labels.count { Text(labels[sections]) }
+                }
+            }
+            .frame(height: 16)
+        } else {
+            HStack(spacing: 4) {
+                Text("Weekly limit used that day:")
+                ForEach(0...sectionCount, id: \.self) { cell(sections: $0, level: 3) }
+                Text("each section = 1/\(sectionCount) of a day's even share (100% ÷ 7)")
+            }
+            .frame(height: 16)
+        }
+    }
+
+    @ViewBuilder
+    private var orange: some View {
+        Group {
             if levels.mode == "five_hour" {
                 HStack(spacing: 4) {
                     Text("Orange = peak 5-hour usage:")
@@ -102,19 +146,12 @@ struct LegendView: View {
                 }
             } else {
                 HStack(spacing: 4) {
-                    Text("Sessions: fewer")
+                    Text("Orange = sessions: fewer")
                     ForEach(1...4, id: \.self) { cell(sections: sectionCount, level: $0) }
                     Text("more")
                 }
             }
-            HStack(spacing: 4) {
-                Text("Weekly limit used that day:")
-                ForEach(0...sectionCount, id: \.self) { cell(sections: $0, level: 3) }
-                Text("each section = 1/\(sectionCount) of a day's even share (100% ÷ 7)")
-            }
         }
-        .font(.caption)
-        .foregroundStyle(.secondary)
         .frame(height: 16)
     }
 }

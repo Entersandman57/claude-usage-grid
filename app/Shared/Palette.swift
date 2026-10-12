@@ -15,8 +15,11 @@ enum Palette {
     static let background = Color(hex: 0x17181c)  // also shows through the section dividers
     static let unfilled = Color(hex: 0x2e3037)    // an unfilled battery section (also days with no data)
     static let surface = Color(hex: 0x24262b)     // cards in the app's windows
-    /// Session levels 1-4: fewer sessions are a light, whitish orange, more are deep and vivid.
+    /// Orange levels 1-4 (peak 5-hour %): light and whitish for a quiet day, deep and vivid near the limit.
     static let levels = [Color(hex: 0xFDE5D2), Color(hex: 0xFAB27E), Color(hex: 0xF07A2A), Color(hex: 0xCC5500)]
+    /// Afterburner: a pale, hot yellow rim with an orange glow around the cell.
+    static let afterburnerRim = Color(hex: 0xFFE7A8)
+    static let afterburnerGlow = Color(hex: 0xFF9F2E)
 }
 
 /// How cells are painted.
@@ -39,6 +42,8 @@ struct CellStyle: Equatable {
     }
 
     var unfilled: Color { fullColor ? Palette.unfilled : Color.white.opacity(0.14) }
+    var afterburnerRim: Color { fullColor ? Palette.afterburnerRim : Color.white }
+    var afterburnerGlow: Color { fullColor ? Palette.afterburnerGlow : Color.white.opacity(0.8) }
     var label: Color { Color.white.opacity(fullColor ? 0.5 : 0.7) }
     var text: Color { Color.white.opacity(0.85) }
 }
@@ -68,20 +73,22 @@ enum CellGeometry {
 }
 
 /// A day square drawn as a battery: `sectionCount` full-width sections split by
-/// thin gaps, filled bottom-up with the day's share of the weekly limit, in the
-/// day's session-level orange. A day before tracking started looks exactly
-/// like a tracked day with zero usage: an empty battery (tooltips and the day
-/// view still say "no data yet").
+/// thin gaps, filled bottom-up with the day's sessions (or, with the "usage"
+/// battery source, its share of the weekly limit), in the day's orange (its
+/// peak 5-hour %). An afterburner day (a 5-hour window maxed out, then real use
+/// of another) gets a hot rim and glow.
 struct DayCell: View {
     let day: GridDay
     let size: CGFloat
     var style: CellStyle = .color
     var sectionCount = 3
 
+    private var corner: CGFloat { size * 0.2 }
+
     var body: some View {
-        VStack(spacing: CellGeometry.divider) {
+        let battery = VStack(spacing: CellGeometry.divider) {
             ForEach((0..<sectionCount).reversed(), id: \.self) { index in
-                if day.usageKnown, index < day.sections {
+                if index < day.sections {
                     Rectangle().fill(style.filled(level: day.level)).widgetAccentable()
                 } else {
                     Rectangle().fill(style.unfilled)
@@ -90,6 +97,26 @@ struct DayCell: View {
             .frame(height: CellGeometry.sectionHeight(size: size, count: sectionCount))
         }
         .frame(width: size, height: size)
-        .clipShape(RoundedRectangle(cornerRadius: size * 0.2, style: .continuous))  // only the outer corners
+        .clipShape(RoundedRectangle(cornerRadius: corner, style: .continuous))  // only the outer corners
+
+        if day.afterburner == true {
+            let glow = min(5, max(2.5, size * 0.16))
+            // Flattened over a solid base so the glow is cast only outside the
+            // cell: per-layer shadows would haze the sections and fill the dividers.
+            battery
+                .overlay {
+                    RoundedRectangle(cornerRadius: corner, style: .continuous)
+                        .strokeBorder(style.afterburnerRim, lineWidth: size >= 28 ? 2 : 1)
+                        .widgetAccentable()
+                }
+                .background(style.fullColor ? Palette.background : Color(white: 0.1),
+                            in: RoundedRectangle(cornerRadius: corner, style: .continuous))
+                .compositingGroup()
+                .shadow(color: style.afterburnerGlow, radius: glow)
+                .shadow(color: style.afterburnerGlow.opacity(0.7), radius: glow / 2.5)
+                .accessibilityLabel("Afterburner day")
+        } else {
+            battery
+        }
     }
 }

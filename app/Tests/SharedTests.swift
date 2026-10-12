@@ -30,6 +30,51 @@ final class SharedTests: XCTestCase {
         XCTAssertEqual(details.status.meterLastRun?.trigger, "nightly")
     }
 
+    func testDecodesBatteryRuleAndAfterburner() throws {
+        let json = """
+        {"battery": {"source": "sessions", "thresholds": [1, 4]},
+         "afterburner": {"maxed_pct": 100, "other_pct": 10},
+         "day": {"date": "2026-10-10", "usage_pp": 20, "sections": 3, "sessions": 9, "level": 4,
+                 "usage_known": true, "afterburner": true},
+         "detail": {"usage_pp": 20, "share_fraction": 1.4, "sections": 3, "peak_five_hour_pct": 100,
+                    "five_hour_samples": 3, "afterburner": true, "sessions": 9, "sessions_code": 1,
+                    "sessions_chat": 8, "inferred_session": false, "level": 4, "code_sessions": [], "chats": [],
+                    "five_hour_windows": [{"resets_at": 1791619200, "peak_pct": 100, "samples": 2},
+                                          {"resets_at": 1791637200, "peak_pct": 31, "samples": 1}]}}
+        """
+        struct Parts: Decodable {
+            var battery: BatteryRule
+            var afterburner: AfterburnerRule
+            var day: GridDay
+            var detail: DayDetail
+        }
+        let parts = try GridJSON.decoder().decode(Parts.self, from: Data(json.utf8))
+        XCTAssertEqual(parts.battery.sessionLabels, ["0", "1", "2–4", "5+"])
+        XCTAssertEqual(parts.afterburner, .standard)
+        XCTAssertEqual(parts.day.afterburner, true)
+        XCTAssertEqual(parts.detail.fiveHourWindows?.map(\.peakPct), [100, 31])
+        XCTAssertEqual(parts.detail.afterburnerText, "Maxed out a 5-hour window, then used 31% of another")
+
+        // A version 2 snapshot (no battery rule, no afterburner) still decodes.
+        let old = try GridJSON.decoder().decode(Snapshot.self, from: fixture("snapshot"))
+        XCTAssertNil(old.battery)
+        XCTAssertTrue(old.days.allSatisfy { $0.afterburner == nil })
+    }
+
+    func testSessionLabelsFollowTheThresholds() {
+        XCTAssertEqual(BatteryRule(source: "sessions", thresholds: [2, 5]).sessionLabels, ["0", "1–2", "3–5", "6+"])
+        XCTAssertEqual(BatteryRule(source: "sessions", thresholds: [1, 2, 3]).sessionLabels, ["0", "1", "2", "3", "4+"])
+    }
+
+    func testAfterburnerTextNeedsTheFlag() {
+        var detail = try! GridJSON.decoder().decode(Details.self, from: fixture("details")).days["2026-09-30"]!
+        detail.fiveHourWindows = [FiveHourWindow(resetsAt: 1, peakPct: 100, samples: 1),
+                                  FiveHourWindow(resetsAt: 2, peakPct: 100, samples: 1)]
+        XCTAssertNil(detail.afterburnerText)
+        detail.afterburner = true
+        XCTAssertEqual(detail.afterburnerText, "Maxed out two 5-hour windows")
+    }
+
     // MARK: Weeks
 
     func testWeeksAreSundayFirstAndHideFutureDays() throws {
@@ -74,6 +119,7 @@ final class SharedTests: XCTestCase {
         }
         let shown = Array(days.suffix(17 * 7))  // what a 17-week medium widget shows
         XCTAssertTrue(shown.contains { !$0.usageKnown })
+        XCTAssertTrue(shown.contains { $0.afterburner == true })
     }
 
     // MARK: Layout

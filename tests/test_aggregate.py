@@ -129,27 +129,54 @@ def test_dst_spring_forward(new_york):
     (DAY_SHARE * 2 / 3, 2),
     (DAY_SHARE * 0.67, 3),           # f > 2/3
     (DAY_SHARE, 3), (50, 3)])
-def test_three_sections(pp, sections):
-    assert aggregate.sections_for(pp, CONFIG) == sections
+def test_three_sections_from_usage(pp, sections):
+    assert aggregate.usage_sections(pp, CONFIG) == sections
+
+
+@pytest.mark.parametrize("sessions, sections", [(0, 0), (1, 1), (2, 2), (4, 2), (5, 3), (11, 3)])
+def test_three_sections_from_sessions(sessions, sections):
+    assert aggregate.session_sections(sessions, CONFIG["session_section_thresholds"]) == sections
+
+
+def test_battery_fills_with_sessions(new_york):
+    readings = [r((2026, 9, 29, 23, 55), 5), r((2026, 9, 30, 23, 55), 40)]  # a big usage day ...
+    activity = [act((2026, 9, 30, 12, 0), "s%d" % i) for i in range(3)]  # ... with 3 sessions
+    snapshot, details = build(date(2026, 9, 30), readings=readings, activity=activity)
+    assert snapshot["battery"] == {"source": "sessions", "thresholds": [1, 4]}
+    assert snapshot["afterburner"] == {"maxed_pct": 100, "other_pct": 10}
+    assert snapshot["section_count"] == 3
+    assert (snapshot["days"][-1]["sections"], details["days"]["2026-09-30"]["usage_pp"]) == (2, 35.0)
+
+
+def test_usage_source_brings_back_the_weekly_share(new_york):
+    readings = [r((2026, 9, 29, 23, 55), 5), r((2026, 9, 30, 23, 55), 40)]
+    activity = [act((2026, 9, 30, 12, 0), "s%d" % i) for i in range(3)]
+    usage_config = dict(CONFIG, section_source="usage")
+    snapshot, _ = build(date(2026, 9, 30), usage_config, readings=readings, activity=activity)
+    assert snapshot["battery"] == {"source": "usage", "thresholds": [0.3333333333, 0.6666666667]}
+    assert snapshot["days"][-1]["sections"] == 3
 
 
 def test_section_count_follows_the_config(new_york):
     snapshot, _ = build(date(2026, 9, 30))
     assert snapshot["section_count"] == 3
-    four = dict(CONFIG, section_thresholds=[0.25, 0.5, 0.75])
+    four = dict(CONFIG, session_section_thresholds=[1, 2, 3])
     snapshot, _ = aggregate.build(inputs(), date(2026, 9, 30), four, generated_at=0)
-    assert snapshot["section_count"] == 4 and aggregate.sections_for(50, four) == 4
+    assert snapshot["section_count"] == 4
+    four_usage = dict(CONFIG, section_source="usage", section_thresholds=[0.25, 0.5, 0.75])
+    snapshot, _ = aggregate.build(inputs(), date(2026, 9, 30), four_usage, generated_at=0)
+    assert snapshot["section_count"] == 4 and aggregate.usage_sections(50, four_usage) == 4
 
 
-def test_no_data_days_differ_from_zero_usage_days(new_york):
+def test_days_before_tracking_still_fill_with_sessions(new_york):
     # First reading ever on Sep 28; Sep 29 is tracked but unused; Sep 30 has usage.
     readings = [r((2026, 9, 28, 23, 55), 5), r((2026, 9, 29, 23, 55), 5), r((2026, 9, 30, 23, 55), 7)]
     activity = [act((2026, 9, 27, 12, 0), "old")]  # a session before tracking started
     snapshot, _ = build(date(2026, 9, 30), readings=readings, activity=activity)
     by_date = {d["date"]: d for d in snapshot["days"]}
-    assert (by_date["2026-09-27"]["usage_known"], by_date["2026-09-27"]["sessions"]) == (False, 1)  # no data
+    assert [by_date["2026-09-27"][k] for k in ("usage_known", "sessions", "sections", "level")] == [False, 1, 1, 1]
     assert (by_date["2026-09-29"]["usage_known"], by_date["2026-09-29"]["sections"]) == (True, 0)   # empty battery
-    assert (by_date["2026-09-30"]["usage_known"], by_date["2026-09-30"]["sections"]) == (True, 1)
+    assert (by_date["2026-09-30"]["usage_known"], by_date["2026-09-30"]["sections"]) == (True, 1)  # inferred session
 
 
 # --- sessions ------------------------------------------------------------------------------
@@ -240,7 +267,7 @@ def days_with(counts, end=date(2026, 9, 30)):
     (0, 0, 0), (None, 0, 0),
 ])
 def test_five_hour_level(peak, used, level):
-    assert aggregate.five_hour_level(peak, used, [25, 50, 75]) == level
+    assert aggregate.five_hour_level(peak, used > 0, [25, 50, 75]) == level
 
 
 def test_orange_follows_the_peak_five_hour(new_york):
@@ -288,6 +315,52 @@ def test_quartiles_only_use_the_trailing_365_days(new_york):
     assert details["levels"]["mode"] == "fixed" and details["levels"]["nonzero_days"] == 5
 
 
+# --- afterburner ---------------------------------------------------------------------------
+
+def windows_of(*peaks):
+    return [{"resets_at": 1000 + i * 18000, "peak_pct": p, "samples": 1} for i, p in enumerate(peaks)]
+
+
+@pytest.mark.parametrize("peaks, expected", [
+    ((100, 23), True),       # maxed out, then kept going in the next window
+    ((23, 100), True),       # order doesn't matter
+    ((100, 100), True),
+    ((100, 10.5), True),
+    ((100, 10), False),      # the other window must be over 10%
+    ((100,), False),         # maxed out once and stopped
+    ((99, 60), False),       # close isn't maxed
+    ((60, 80, 40), False),
+    ((), False),
+])
+def test_is_afterburner(peaks, expected):
+    assert aggregate.is_afterburner(windows_of(*peaks), CONFIG) is expected
+
+
+def test_five_hour_windows_are_grouped_by_reset(new_york):
+    first, second = local_epoch(2026, 10, 10, 14, 0), local_epoch(2026, 10, 10, 20, 0)
+    readings = [r((2026, 10, 10, 9, 55), 10, five=40, five_reset=first),
+                r((2026, 10, 10, 12, 55), 20, five=100, five_reset=first + 30),   # jitter: same window
+                r((2026, 10, 10, 15, 55), 22, five=12, five_reset=second),
+                r((2026, 10, 10, 16, 55), 23, five=5, five_reset=None)]           # can't be placed
+    windows = aggregate.five_hour_windows_by_day(readings, CONFIG)[date(2026, 10, 10)]
+    assert windows == [{"resets_at": first, "peak_pct": 100.0, "samples": 2},
+                       {"resets_at": second, "peak_pct": 12.0, "samples": 1}]
+
+
+def test_afterburner_day(new_york):
+    first, second = local_epoch(2026, 10, 10, 14, 0), local_epoch(2026, 10, 10, 20, 0)
+    readings = [r((2026, 10, 9, 23, 55), 10, five=0, five_reset=first - 86400),
+                r((2026, 10, 10, 12, 55), 20, five=100, five_reset=first),
+                r((2026, 10, 10, 17, 55), 25, five=31, five_reset=second),
+                r((2026, 10, 11, 9, 55), 26, five=100, five_reset=second + 86400)]  # maxed once, stopped
+    snapshot, details = build(date(2026, 10, 11), readings=readings)
+    by_date = {d["date"]: d for d in snapshot["days"]}
+    assert (by_date["2026-10-10"]["afterburner"], by_date["2026-10-11"]["afterburner"]) == (True, False)
+    assert details["days"]["2026-10-10"]["afterburner"] is True
+    assert [w["peak_pct"] for w in details["days"]["2026-10-10"]["five_hour_windows"]] == [100.0, 31.0]
+    assert by_date["2026-10-09"]["afterburner"] is False
+
+
 # --- grid and outputs ----------------------------------------------------------------------
 
 def test_empty_history(new_york):
@@ -325,7 +398,7 @@ def test_header_and_usage_known(new_york):
     assert snapshot["usage_tracked_since"] == "2026-09-30"
     assert [d["usage_known"] for d in snapshot["days"][-2:]] == [False, True]
     assert snapshot["days"][-1] == {"date": "2026-09-30", "usage_pp": 3.0, "sections": 1, "sessions": 1,
-                                    "level": 1, "usage_known": True}
+                                    "level": 1, "afterburner": False, "usage_known": True}
 
 
 @pytest.mark.parametrize("through, days_since, remind", [
@@ -346,7 +419,7 @@ def test_user_config_overrides_thresholds(grid_home):
     (grid_home / "aggregator-config.json").write_text(json.dumps({"section_thresholds": [0.1, 0.2, 0.3]}))
     config = aggregate.load_config()
     assert config["section_thresholds"] == [0.1, 0.2, 0.3] and config["grid_weeks"] == 53
-    assert aggregate.sections_for(DAY_SHARE * 0.25, config) == 3
+    assert aggregate.usage_sections(DAY_SHARE * 0.25, config) == 3
 
 
 def test_cli_writes_outputs_and_skips_malformed_lines(grid_home):

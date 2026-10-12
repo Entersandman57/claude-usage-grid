@@ -64,7 +64,7 @@ struct UsageGridWidget: Widget {
                 .containerBackground(for: .widget) { Palette.background }
         }
         .configurationDisplayName("Claude Usage Grid")
-        .description("Each day is a battery: how much of your weekly limit you used. Orange: how close you came to your 5-hour limit.")
+        .description("Each day is a battery that fills with your sessions. Orange: how close you came to your 5-hour limit. A glow: you maxed out a 5-hour window and kept going.")
         .supportedFamilies([.systemMedium, .systemLarge, .systemExtraLarge])
         // macOS's default margins are 18 pt a side (a 344x164 medium widget leaves
         // 308x128). Our own 12 pt leaves room for 14 pt cells with 4 pt gaps.

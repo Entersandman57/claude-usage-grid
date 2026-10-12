@@ -76,7 +76,8 @@ enum PreviewRenderer {
     }
 }
 
-/// Every cell state: rows are 3-0 filled sections, columns session levels 1-4, plus no data.
+/// Every cell state: rows are 3-0 filled sections, columns orange levels 1-4,
+/// plus an afterburner (level 4) column.
 private struct CellKey: View {
     let size: CGFloat
     let style: CellStyle
@@ -84,11 +85,11 @@ private struct CellKey: View {
     private var column: CGFloat { max(size, 48) }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 10) {
                 Text("\(Int(size)) pt").frame(width: 64, alignment: .leading)
                 ForEach(1...4, id: \.self) { Text("Level \($0)").frame(width: column) }
-                Text("No data").frame(width: column)
+                Text("Afterburner").fixedSize().frame(width: column)
             }
             .frame(height: 14)
             ForEach((0...3).reversed(), id: \.self) { sections in
@@ -100,12 +101,10 @@ private struct CellKey: View {
                                 size: size, style: style)
                             .frame(width: column)
                     }
-                    if sections == 0 {
-                        DayCell(day: GridDay(date: "", usagePp: 0, sections: 0, sessions: 0, level: 0,
-                                             usageKnown: false),
-                                size: size, style: style)
-                            .frame(width: column)
-                    }
+                    DayCell(day: GridDay(date: "", usagePp: 0, sections: sections, sessions: 6, level: 4,
+                                         usageKnown: true, afterburner: true),
+                            size: size, style: style)
+                        .frame(width: column)
                 }
                 .frame(height: size)
             }

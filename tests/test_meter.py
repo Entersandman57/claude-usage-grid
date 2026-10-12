@@ -50,45 +50,90 @@ def test_full_utilization_is_100_percent():
 
 # --- schedule ------------------------------------------------------------------------------
 
-@pytest.mark.parametrize("when, last_day, expected", [
-    ((2026, 9, 30, 12, 0), None, None),                 # ordinary afternoon
-    ((2026, 9, 30, 23, 54), None, None),
-    ((2026, 9, 30, 23, 55), None, "nightly"),
-    ((2026, 9, 30, 23, 54, 40), None, "nightly"),       # launchd a few seconds early
-    ((2026, 9, 30, 23, 55), "2026-09-30", None),        # already ran today
-    ((2026, 10, 1, 7, 10), "2026-09-29", None),         # woke after a missed night: no catch-up
-    ((2026, 10, 4, 20, 54), None, None),                # reset day, before the pre-reset slot
-    ((2026, 10, 4, 20, 55), None, "pre_reset"),         # reset day: last :55 before 21:00
-    ((2026, 10, 4, 20, 59, 30), None, None),            # too close to the reset
-    ((2026, 10, 4, 21, 10), None, None),                # pre-reset slot missed ...
-    ((2026, 10, 4, 23, 55), None, "nightly"),           # ... so the day's run is at 23:55
-    ((2026, 10, 4, 23, 55), "2026-10-04", None),        # pre-reset run already happened
-    ((2026, 10, 11, 20, 55), None, "pre_reset"),        # next week, projected from the known reset
-    ((2026, 11, 1, 19, 55), None, "pre_reset"),         # DST ended: reset is 20:00 EST
-    ((2026, 11, 1, 20, 55), None, None),
-    ((2026, 11, 1, 23, 55), None, "nightly"),
+def test_rejected_window_without_utilization_is_at_its_limit():
+    info = {"status": "rejected", "rateLimitType": "five_hour", "resetsAt": 7}
+    assert meter.parse_rate_limit_info(info) == {"five_hour": {"used_percentage": 100.0, "resets_at": 7}}
+
+
+# --- schedule ------------------------------------------------------------------------------
+
+def test_slots_every_three_hours_ending_at_2355():
+    from datetime import date
+    hours = [slot.hour for slot in meter.regular_slots(date(2026, 9, 30), 3)]
+    assert hours == [2, 5, 8, 11, 14, 17, 20, 23]
+    assert all(slot.minute == 55 for slot in meter.regular_slots(date(2026, 9, 30), 3))
+    assert [slot.hour for slot in meter.regular_slots(date(2026, 9, 30), 24)] == [23]  # once a day
+    assert [slot.hour for slot in meter.regular_slots(date(2026, 9, 30), 5)] == [3, 8, 13, 18, 23]
+
+
+@pytest.mark.parametrize("config, hours", [
+    ({}, 3), ({"meter_interval_hours": 6}, 6), ({"meter_interval_hours": 24}, 24),
+    ({"meter_interval_hours": 0}, 3), ({"meter_interval_hours": 25}, 3),
+    ({"meter_interval_hours": "2"}, 3), ({"meter_interval_hours": True}, 3),
 ])
-def test_due_run(new_york, when, last_day, expected):
+def test_interval_hours(config, hours):
+    assert meter.interval_hours(config) == hours
+
+
+@pytest.mark.parametrize("when, last_slot, expected", [
+    ((2026, 9, 30, 0, 55), None, None),                                   # before the day's first slot
+    ((2026, 9, 30, 1, 55), None, None),
+    ((2026, 9, 30, 2, 55), None, ("scheduled", "2026-09-30T02:55")),
+    ((2026, 9, 30, 2, 54, 40), None, ("scheduled", "2026-09-30T02:55")),  # launchd a few seconds early
+    ((2026, 9, 30, 3, 55), "2026-09-30T02:55", None),                     # that slot already ran
+    ((2026, 9, 30, 12, 0), "2026-09-30T08:55", ("scheduled", "2026-09-30T11:55")),
+    ((2026, 9, 30, 13, 55), "2026-09-30T08:55", ("scheduled", "2026-09-30T11:55")),  # woke late: catch up
+    ((2026, 9, 30, 14, 55), "2026-09-30T08:55", ("scheduled", "2026-09-30T14:55")),  # only the latest slot
+    ((2026, 9, 30, 23, 55), "2026-09-30T20:55", ("scheduled", "2026-09-30T23:55")),
+    ((2026, 10, 1, 0, 55), "2026-09-29T23:55", None),                     # missed 23:55: no catch-up after midnight
+    ((2026, 10, 4, 19, 55), "2026-10-04T17:55", None),                    # reset day
+    ((2026, 10, 4, 20, 55), "2026-10-04T17:55", ("pre_reset", "2026-10-04T20:55")),  # last :55 before 21:00
+    ((2026, 10, 4, 20, 59, 30), "2026-10-04T17:55", ("scheduled", "2026-10-04T20:55")),  # too close to the reset
+    ((2026, 10, 4, 21, 55), "2026-10-04T20:55", None),                    # pre-reset run counts as that slot
+    ((2026, 10, 4, 23, 55), "2026-10-04T20:55", ("scheduled", "2026-10-04T23:55")),
+    ((2026, 10, 11, 20, 55), None, ("pre_reset", "2026-10-11T20:55")),    # next week, projected from the known reset
+    ((2026, 11, 1, 19, 55), "2026-11-01T17:55", ("pre_reset", "2026-11-01T19:55")),  # DST ended: reset is 20:00 EST
+    ((2026, 11, 1, 20, 55), "2026-11-01T19:55", ("scheduled", "2026-11-01T20:55")),
+])
+def test_due_run(new_york, when, last_slot, expected):
     assert local_epoch(2026, 10, 4, 21, 0) == REAL_WEEKLY_RESET
-    assert meter.due_run(local_epoch(*when), last_day, REAL_WEEKLY_RESET) == expected
+    assert meter.due_run(local_epoch(*when), last_slot, REAL_WEEKLY_RESET) == expected
 
 
-def test_pre_reset_slot_is_last_wakeup_before_a_half_hour_reset(new_york):
-    reset = local_epoch(2026, 10, 7, 21, 30)
-    assert meter.due_run(local_epoch(2026, 10, 7, 20, 55), None, reset) == "pre_reset"
-    assert meter.due_run(local_epoch(2026, 10, 7, 21, 55), None, reset) is None
+def test_pre_reset_slot_between_regular_slots(new_york):
+    reset = local_epoch(2026, 10, 7, 22, 30)
+    assert meter.due_run(local_epoch(2026, 10, 7, 21, 55), "2026-10-07T20:55", reset) == (
+        "pre_reset", "2026-10-07T21:55")
+    assert meter.due_run(local_epoch(2026, 10, 7, 22, 55), "2026-10-07T21:55", reset) is None
+    assert meter.due_run(local_epoch(2026, 10, 7, 23, 55), "2026-10-07T21:55", reset) == (
+        "scheduled", "2026-10-07T23:55")
 
 
-def test_reset_just_after_midnight_uses_normal_nightly_slots(new_york):
+def test_reset_just_after_midnight_uses_normal_slots(new_york):
     reset = local_epoch(2026, 10, 5, 0, 30)
-    assert meter.due_run(local_epoch(2026, 10, 4, 23, 55), None, reset) == "nightly"
-    assert meter.due_run(local_epoch(2026, 10, 5, 0, 20), "2026-10-04", reset) is None
-    assert meter.due_run(local_epoch(2026, 10, 5, 23, 55), "2026-10-04", reset) == "nightly"
+    assert meter.due_run(local_epoch(2026, 10, 4, 23, 55), None, reset) == ("scheduled", "2026-10-04T23:55")
+    assert meter.due_run(local_epoch(2026, 10, 5, 0, 20), "2026-10-04T23:55", reset) is None
 
 
-def test_unknown_reset_means_nightly_only(new_york):
-    assert meter.due_run(local_epoch(2026, 10, 4, 20, 55), None, None) is None
-    assert meter.due_run(local_epoch(2026, 10, 4, 23, 55), None, None) == "nightly"
+def test_unknown_reset_means_regular_slots_only(new_york):
+    assert meter.due_run(local_epoch(2026, 10, 4, 21, 55), "2026-10-04T20:55", None) is None
+    assert meter.due_run(local_epoch(2026, 10, 4, 23, 55), "2026-10-04T20:55", None) == (
+        "scheduled", "2026-10-04T23:55")
+
+
+def test_once_a_day_interval_matches_the_old_schedule(new_york):
+    assert meter.due_run(local_epoch(2026, 9, 30, 20, 55), None, None, interval=24) is None
+    assert meter.due_run(local_epoch(2026, 9, 30, 23, 55), None, None, interval=24) == (
+        "scheduled", "2026-09-30T23:55")
+
+
+def test_state_from_the_once_a_day_meter_counts_its_last_run(new_york):
+    state = {"last_auto_day": "2026-10-11",
+             "last_run": {"ts": local_epoch(2026, 10, 11, 20, 55, 8), "trigger": "pre_reset"}}
+    assert meter.last_auto_slot(state) == "2026-10-11T20:55"
+    assert meter.due_run(local_epoch(2026, 10, 11, 22, 55), meter.last_auto_slot(state), None) is None
+    assert meter.last_auto_slot({"last_run": {"ts": 1, "trigger": "manual"}}) is None
+    assert meter.last_auto_slot(dict(state, last_auto_slot="2026-10-11T23:55")) == "2026-10-11T23:55"
 
 
 def test_status_line_supplies_the_reset_when_newer(grid_home):
@@ -166,16 +211,27 @@ def test_claude_is_called_minimally_and_tagged(grid_home, fake_claude):
     assert call["cwd"] == os.path.realpath(str(grid_home / "meter-cwd"))
 
 
-def test_scheduled_run_happens_once_per_day(grid_home, fake_claude, monkeypatch, new_york):
+def test_scheduled_runs_once_per_slot(grid_home, fake_claude, monkeypatch, new_york):
     fake_claude("meter_stream_ok.jsonl")
-    monkeypatch.setenv("CLAUDE_USAGE_GRID_NOW", str(local_epoch(2026, 9, 30, 22, 55)))
-    meter.main(["--scheduled"])
-    assert fake_claude.calls() == []
+    for when in ((2026, 9, 30, 21, 55), (2026, 9, 30, 22, 55)):  # 20:55 slot runs late, once
+        monkeypatch.setenv("CLAUDE_USAGE_GRID_NOW", str(local_epoch(*when)))
+        meter.main(["--scheduled"])
+    assert len(fake_claude.calls()) == 1
     for minute_later in (0, 60):  # 23:55, then launchd again at 00:55 the next day
         monkeypatch.setenv("CLAUDE_USAGE_GRID_NOW", str(local_epoch(2026, 9, 30, 23, 55) + minute_later * 60))
         meter.main(["--scheduled"])
-    assert len(fake_claude.calls()) == 1
-    assert jsonl(grid_home / "readings.jsonl")[0]["trigger"] == "nightly"
+    assert len(fake_claude.calls()) == 2
+    assert [r["trigger"] for r in jsonl(grid_home / "readings.jsonl")] == ["scheduled", "scheduled"]
+    state = json.loads((grid_home / "state" / "meter.json").read_text())
+    assert (state["last_auto_slot"], state["last_auto_day"]) == ("2026-09-30T23:55", "2026-09-30")
+
+
+def test_interval_comes_from_config(grid_home, fake_claude, monkeypatch, new_york):
+    fake_claude("meter_stream_ok.jsonl")
+    (grid_home / "config.json").write_text(json.dumps({"meter_interval_hours": 24}))
+    monkeypatch.setenv("CLAUDE_USAGE_GRID_NOW", str(local_epoch(2026, 9, 30, 20, 55)))
+    meter.main(["--scheduled"])
+    assert fake_claude.calls() == []
 
 
 def test_failed_scheduled_run_is_not_retried(grid_home, fake_claude, monkeypatch, new_york):
@@ -198,7 +254,7 @@ def test_scheduled_reset_day_uses_pre_reset_slot(grid_home, fake_claude, monkeyp
         monkeypatch.setenv("CLAUDE_USAGE_GRID_NOW", str(local_epoch(*when)))
         meter.main(["--scheduled"])
     triggers = [r["trigger"] for r in jsonl(grid_home / "readings.jsonl")]
-    assert triggers == ["manual", "pre_reset"]
+    assert triggers == ["manual", "scheduled", "pre_reset", "scheduled"]  # 17:55 caught up at 19:55
 
 
 def test_timeout_is_recorded(grid_home, fake_claude):

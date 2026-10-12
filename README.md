@@ -2,7 +2,7 @@
 
 > **This project is vibe coded.** It was written by Claude (Anthropic's AI) in Claude Code, from my spec and feedback, with me testing it on my own Mac. I didn't write the code by hand. Treat it as a personal project, not reviewed production software.
 
-A macOS desktop widget, styled like GitHub's contribution graph, that charts your daily Claude usage. Each day is a little battery: how much of your weekly plan limit you used, filled in an orange that shows how close you came to your 5-hour limit. A menu bar app hosts it, with a full-year grid window and a view of each day's sessions and chats.
+A macOS desktop widget, styled like GitHub's contribution graph, that charts your daily Claude usage. Each day is a little battery that fills with that day's sessions, in an orange that shows how close you came to your 5-hour limit, and glows on days you maxed out a 5-hour window and kept going. A menu bar app hosts it, with a full-year grid window and a view of each day's sessions and chats.
 
 ![The medium widget, with made-up sample data](docs/widget-medium-sample.png)
 
@@ -34,15 +34,13 @@ The app starts at login (toggle **Launch at Login** in its menu). It lives in th
 
 Columns are weeks (oldest on the left, this week on the right), rows run Sunday to Saturday, and future days are hidden. The medium widget shows about 16 weeks; large stacks two bands (about 32 weeks); extra large shows the whole year.
 
-**Each day is a battery.** The square is split into 3 horizontal sections that fill from the bottom. A section is ⅓ of a day's even share of your weekly limit (100% ÷ 7 ≈ 14.29% of the week).
+**Each day is a battery that fills with your sessions.** The square is split into 3 horizontal sections that fill from the bottom, by how many sessions (Claude Code sessions plus claude.ai chats) you had that day:
 
-| The day's usage, as f = usage ÷ 14.29% | The square |
-|---|---|
-| Before the first usage reading ever recorded | looks like an empty battery; the tooltip and day view say "no data yet" |
-| f = 0 | empty battery: 3 unfilled sections |
-| 0 < f ≤ ⅓ | 1 section filled |
-| ⅓ < f ≤ ⅔ | 2 sections filled |
-| f > ⅔ | 3 sections filled |
+| Sessions that day | 0 | 1 | 2–4 | 5 or more |
+|---|---|---|---|---|
+| Filled sections | none (empty battery) | 1 | 2 | 3 |
+
+Sessions are known further back than usage (chats go back as far as your export), so days before usage tracking started still fill; their tooltip says "before usage tracking started". `session_section_thresholds` ([1, 4]) sets the steps. To fill by the day's share of your weekly limit instead (a section per ⅓ of 100% ÷ 7), set `"section_source": "usage"`.
 
 **The orange shows how close you came to your 5-hour limit that day**: the highest 5-hour % among that day's readings. A light, whitish orange means you stayed well under it; a deep, vivid orange means you nearly hit it.
 
@@ -50,35 +48,39 @@ Columns are weeks (oldest on the left, this week on the right), rows run Sunday 
 |---|---|---|---|---|
 | Filled section color | `#FDE5D2` | `#FAB27E` | `#F07A2A` | `#CC5500` |
 
-A day with usage but no 5-hour reading gets the lightest orange. The peak is only as good as the readings behind it; see [Known limitations](#known-limitations). To color by session count instead (Claude Code sessions plus claude.ai chats, ranked against your own history), set `"level_source": "sessions"` in the config.
+A day with usage or sessions but no 5-hour reading (such as a day before tracking started) gets the lightest orange. The peak is only as good as the readings behind it; see [Known limitations](#known-limitations). To color by session count instead (Claude Code sessions plus claude.ai chats, ranked against your own history), set `"level_source": "sessions"` in the config.
+
+**Afterburner.** A day glows, with a pale yellow rim (`#FFE7A8`) and an orange halo (`#FF9F2E`), when one of its 5-hour windows was maxed out (100%) and another 5-hour window that day went over 10%: you hit the limit, waited out the reset and kept working. Readings are grouped into windows by their reset time. Like the peak, this only sees what the readings caught: a window counts as maxed only if a reading saw it at 100%, which stays true from the moment you hit the limit until it resets. `afterburner_maxed_pct` and `afterburner_other_pct` set the two numbers.
 
 Unfilled sections are `#2e3037`, and the thin dividers show the widget's background (`#17181c`). Days are 4 pt apart.
 
-**When macOS drains the widget's color** (a window in front, or a monochrome or tinted widget style), the widget keeps its meaning through brightness alone. Filled sections are clearly brighter than unfilled ones, and brighter with more sessions. For full color even with windows in front, set System Settings → Desktop & Dock → "Dim widgets on desktop" to Never.
+**When macOS drains the widget's color** (a window in front, or a monochrome or tinted widget style), the widget keeps its meaning through brightness alone. Filled sections are clearly brighter than unfilled ones, and brighter with a higher 5-hour peak; an afterburner day gets a white rim and glow around a dark battery. For full color even with windows in front, set System Settings → Desktop & Dock → "Dim widgets on desktop" to Never.
 
-**Clicking a day** opens it in the app: the day's numbers, its Claude Code sessions (title, folder, times, where it ran) and its claude.ai chats. The large and extra large widgets add a header: this week's %, today's sessions, and the latest 5-hour %.
+**Clicking a day** opens it in the app: the day's numbers, its Claude Code sessions (title, folder, times, where it ran) and its claude.ai chats. The day view also lists each 5-hour window read that day with its peak, and says so on an afterburner day. The large and extra large widgets add a header: this week's %, today's sessions, and the latest 5-hour %.
 
-**Update Now** (top of the grid window, or ⌘U in the menu bar menu) takes a fresh usage reading, which is one tiny Claude call, and refreshes your sessions. Otherwise sessions update on their own within seconds, and usage is read automatically once a day.
+**Update Now** (top of the grid window, or ⌘U in the menu bar menu) takes a fresh usage reading, which is one tiny Claude call, and refreshes your sessions. Otherwise sessions update on their own within seconds, and usage is read automatically every 3 hours.
 
-The thresholds live in `aggregator/aggregator-config.json`. To override them, copy it to `~/.claude-usage-grid/aggregator-config.json` and edit the copy. `section_thresholds` sets how many sections a day has.
+The thresholds live in `aggregator/aggregator-config.json`. To override them, copy it to `~/.claude-usage-grid/aggregator-config.json` and edit the copy. The number of section thresholds sets how many sections a day has.
 
 ## How each number is computed
 
 **Usage readings.** A reading is your plan's weekly (`seven_day`) and 5-hour (`five_hour`) usage, as a percentage. Readings come from:
 
 - **The status line**, after each Claude Code response in the terminal. It logs a reading when either value changes, otherwise at most once a minute. The desktop app's Code tab doesn't run status lines, so if you only use the desktop app, readings come from the next two sources.
-- **The daily meter.** launchd wakes `meter.py` every hour at :55, and it makes at most one automatic `claude -p` call a day: normally at 11:55 PM, but on the day your weekly limit resets, at the last :55 before the reset, so that day's pre-reset usage isn't lost. If the Mac is asleep at that moment it runs on wake that same day; a missed day is never made up after midnight, and a failed call is never retried. The call uses Haiku, no tools and a one-word reply, and is tagged so it never counts as a session.
-- **Update Now**, any time. It doesn't use up the automatic run.
+- **The meter, every 3 hours.** launchd wakes `meter.py` every hour at :55, and it makes at most one automatic `claude -p` call per slot: 2:55, 5:55, 8:55, 11:55 AM, 2:55, 5:55, 8:55 and 11:55 PM. 11:55 PM is always a slot, so each day ends with a reading. On the day your weekly limit resets there's one more slot, the last :55 before the reset, so that day's pre-reset usage isn't lost. A slot missed while the Mac was asleep runs on wake, until the next slot or midnight; a missed slot is never made up after that, and a failed call is never retried. The call uses Haiku, no tools and a one-word reply, and is tagged so it never counts as a session. To change the spacing, set `"meter_interval_hours"` in `~/.claude-usage-grid/config.json` (1–24; 24 means once a day at 11:55 PM).
+- **Update Now**, any time. It doesn't use up a slot.
 
 **A day's usage** (% of the week) is the sum of the increases of the weekly % between consecutive readings, each credited to the day of the later reading. The very first reading is only a starting point. A reset starts again from zero, so the new reading's whole value counts: the reset time moved by more than an hour, the previous window had already ended, or the % dropped by 3 or more points. Smaller drops are rounding differences between the status line and the meter and are ignored, so the same points are never counted twice and usage is never negative.
 
-**Peak 5-hour %** is the highest 5-hour % among that day's readings. With only the daily reading it's a single sample, and the day view says how many readings it came from.
+**Peak 5-hour %** is the highest 5-hour % among that day's readings, about 8 a day from the meter plus any Update Now presses. The day view says how many readings it came from and lists each 5-hour window's own peak.
 
 **Sessions** on a day are:
 
 - Claude Code sessions active that day, in the terminal, VS Code or the desktop app: the hooks record each session start and each prompt, and status-line readings also mark their session. Sessions from before the hooks were installed come from `list_sessions()`, which only knows their first and last day.
 - claude.ai chats with at least one message that day, from your imported export.
 - A session that spans several days counts on each of them. A day with usage but no known session counts as 1.
+
+These counts fill the battery (above).
 
 **The orange** comes from the day's peak 5-hour %, in fixed quarters of the 5-hour limit (`five_hour_level_thresholds`: 25, 50, 75). With `"level_source": "sessions"`, it comes from session counts instead: quartiles of your days with sessions over the last 365 days, each at least one session above the previous one, and fixed buckets (1, 2–3, 4–6, 7+) until you have 14 such days. Sessions always show in tooltips, the day view and the large widget's header.
 
@@ -90,7 +92,7 @@ Claude Code sessions are picked up automatically. Chats in claude.ai (or in the 
 2. Download **`conversations-000.zip`** from it (the other files aren't needed). Each link in the manifest works only once.
 3. Drop the ZIP onto the app's grid window, or click **Import claude.ai Export…** there or in the menu bar menu (⌘I). Dropping the manifest itself tells you which file to get.
 
-Only each chat's ID, title and the days it had messages are kept, in `~/.claude-usage-grid/chats.json`. Message text is never stored: the app imports from a temporary copy of the export and deletes it right away. You can delete the downloaded ZIP afterwards; it contains your full chats. The status list shows "Chats imported through <date>". Chats after that date aren't counted until you import a newer export. Chats count toward the session numbers (tooltips, day view, the large widget's header), not the orange. Once your import is more than 7 days old (`chat_reminder_days` in `aggregator-config.json`), a small orange chat bubble appears in the widget's top-left corner, and the grid window and menu bar menu say so, with the Import button next to it. Newer exports may only cover recent chats; older chats from earlier imports are kept. Re-importing is safe: chats are updated, and chats you've since deleted on claude.ai are kept. Chats that were opened but never had a message are skipped.
+Only each chat's ID, title and the days it had messages are kept, in `~/.claude-usage-grid/chats.json`. Message text is never stored: the app imports from a temporary copy of the export and deletes it right away. You can delete the downloaded ZIP afterwards; it contains your full chats. The status list shows "Chats imported through <date>". Chats after that date aren't counted until you import a newer export. Chats count toward the sessions that fill each day's battery (and the tooltips, day view and the large widget's header), not the orange. Once your import is more than 7 days old (`chat_reminder_days` in `aggregator-config.json`), a small orange chat bubble appears in the widget's top-left corner, and the grid window and menu bar menu say so, with the Import button next to it. Newer exports may only cover recent chats; older chats from earlier imports are kept. Re-importing is safe: chats are updated, and chats you've since deleted on claude.ai are kept. Chats that were opened but never had a message are skipped.
 
 In the day view, **Open in Claude** opens a chat in the desktop app and **Open in Browser** opens `https://claude.ai/chat/<id>`.
 
@@ -113,17 +115,17 @@ Claude Code deletes transcripts after `cleanupPeriodDays` (30 by default); after
 | `~/.claude-usage-grid/out/` | what the aggregator computes for the app |
 | `~/.claude-usage-grid/bin/`, `venv/`, `backups/` | installed scripts, the Agent SDK, `settings.json` backups |
 | `~/Library/Group Containers/<team>.claudeusagegrid/` | the widget's copy of the grid |
-| `~/Library/LaunchAgents/local.claude-usage-grid.meter.plist` | the daily meter schedule |
+| `~/Library/LaunchAgents/local.claude-usage-grid.meter.plist` | the meter schedule (an hourly wake-up; `meter.py` picks the slots) |
 
 Titles are your own titles or Claude's auto-generated ones; a session's first prompt (which the SDK can return as a "summary") is never read.
 
-**Cost.** The daily meter call costs about $0.0007 (Claude Code's client-side estimate) and a sliver of your plan usage; each Update Now costs the same.
+**Cost.** Each meter call costs about $0.0007 (Claude Code's client-side estimate) and a sliver of your plan usage, so about 8 a day come to roughly $0.006 a day; each Update Now costs the same. A meter call is a message, so when you haven't used Claude for 5 hours, it starts a new 5-hour window, just as your own first message would. Your windows may then start up to 3 hours before you sit down, and so reset sooner.
 
 ## Known limitations
 
-- **History starts at install.** Plan usage is only known from the first reading, so earlier days look like empty batteries (with any sessions and chats listed when you hover or open them). Claude Code sessions backfill as far as transcripts exist (about 30 days by default); chats go back as far as your export.
-- **Readings are sparse with the desktop app.** Usage is read when the terminal CLI responds, once a day by the meter, and when you press Update Now. A day's usage is credited to the day of the reading that observed it: if the Mac is asleep through midnight, usage from late that day lands on the next reading's day, and if it's off at reading time, that day's usage lands on the next reading's day.
-- **Peak 5-hour % is sampled.** It's the highest 5-hour % among the day's readings, so with only the nightly reading it shows the 5-hour window at 11:55 PM, which may have reset hours after your busiest stretch. A busy day can then get a light orange (Oct 8, 2026: 12 points of the week used, one reading at 2%). Each Update Now adds a sample.
+- **History starts at install.** Plan usage is only known from the first reading, so earlier days have no orange depth (lightest orange) and can't glow; their batteries still fill with sessions. Claude Code sessions backfill as far as transcripts exist (about 30 days by default); chats go back as far as your export.
+- **Readings are spaced out with the desktop app.** Usage is read when the terminal CLI responds, every 3 hours by the meter, and when you press Update Now. A day's usage is credited to the day of the reading that observed it: if the Mac is asleep through midnight, usage from late that day lands on the next reading's day, and if it's off at reading time, that day's usage lands on the next reading's day.
+- **Peak 5-hour % and afterburners are sampled.** The peak is the highest 5-hour % among the day's readings, so a window that climbed and reset between two readings 3 hours apart can be missed or read low. Before Oct 11, 2026 there was one reading a night, and busy days could get a light orange (Oct 8: 12 points of the week used, one reading at 2%). An afterburner needs a reading at 100%; that's likely when you're locked out for more than a few hours, and pressing Update Now when you hit the limit makes sure. Whether the meter still gets usage numbers while you're locked out hasn't been tested yet; if the response only says the request was refused for the 5-hour window, the meter records that window at 100%.
 - **Other machines and the cloud.** Sessions on other Macs and cloud sessions aren't counted, though their usage is in the %.
 - **Chats after your last import** aren't counted until the next import (the orange bubble reminds you after 7 days). There's no documented way to see claude.ai chats as they happen.
 - **Undocumented fields.** The meter reads both windows from the stream's `rate_limit_event` → `unifiedWindows`, which isn't documented and may change. If it does, the status list shows "no utilization in output" and the meter needs an update.

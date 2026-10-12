@@ -23,7 +23,7 @@ sys.path.insert(0, HERE)  # installed: common.py sits beside this file
 sys.path.insert(1, os.path.join(os.path.dirname(HERE), "collectors"))  # repo layout
 import common  # noqa: E402
 
-SNAPSHOT_VERSION = 2  # 2: battery sections replaced bars
+SNAPSHOT_VERSION = 3  # 2: battery sections replaced bars; 3: sections from sessions, afterburner
 CONFIG_NAME = "aggregator-config.json"
 EPSILON = 1e-9
 
@@ -126,8 +126,51 @@ def five_hour_by_day(readings):
     return peaks
 
 
-def sections_for(usage_pp, config):
-    """How many of the cell's battery sections are filled (0 to len(section_thresholds) + 1).
+def five_hour_windows_by_day(readings, config):
+    """{day: [{"resets_at", "peak_pct", "samples"}]}: each 5-hour window read that
+    day, with its highest reading. Readings belong to the same window when their
+    resets_at agree within resets_at_tolerance_seconds; a reading without a
+    resets_at can't be placed and is left out (it still counts for the peak)."""
+    tolerance = config["resets_at_tolerance_seconds"]
+    days = defaultdict(list)
+    for reading in readings:
+        window = common.normalize_window(reading.get("five_hour"))
+        if window is None or window["resets_at"] is None:
+            continue
+        pct, resets_at = float(window["used_percentage"]), window["resets_at"]
+        windows = days[day_of(reading["ts"])]
+        match = next((w for w in windows if abs(w["resets_at"] - resets_at) <= tolerance), None)
+        if match is None:
+            windows.append({"resets_at": resets_at, "peak_pct": pct, "samples": 1})
+        else:
+            match["peak_pct"], match["samples"] = max(match["peak_pct"], pct), match["samples"] + 1
+    return dict(days)
+
+
+def is_afterburner(windows, config):
+    """True if a 5-hour window hit its limit (afterburner_maxed_pct) and another
+    window that day went past afterburner_other_pct: you maxed out and kept going."""
+    maxed = [w for w in windows if w["peak_pct"] >= config["afterburner_maxed_pct"] - EPSILON]
+    return any(other is not window and other["peak_pct"] > config["afterburner_other_pct"]
+               for window in maxed for other in windows)
+
+
+def battery_thresholds(config):
+    """(section_source, thresholds): what fills a cell's battery sections."""
+    if config["section_source"] == "usage":
+        return "usage", list(config["section_thresholds"])
+    return "sessions", list(config["session_section_thresholds"])
+
+
+def session_sections(sessions, thresholds):
+    """Sections filled by the day's session count. With the default thresholds
+    [1, 4]: 0 sessions -> 0, 1 -> 1, 2-4 -> 2, 5 or more -> 3."""
+    return level_for(sessions, thresholds)
+
+
+def usage_sections(usage_pp, config):
+    """How many of the cell's battery sections are filled (0 to len(section_thresholds) + 1)
+    when section_source is "usage".
 
     f = the day's usage / an even daily share of the week (100 / days_per_week).
     f = 0 fills none; otherwise the first threshold that f doesn't exceed decides.
@@ -235,14 +278,14 @@ def level_for(value, thresholds):
     return len(thresholds) + 1
 
 
-def five_hour_level(peak, used, thresholds):
+def five_hour_level(peak, active, thresholds):
     """Orange from the day's peak 5-hour %: fixed quarters of the 5-hour limit
-    (with the default thresholds, <=25% is 1, <=50% 2, <=75% 3, above 4). A day
-    with usage but no 5-hour reading above 0 is level 1, so its sections still
-    get the lightest orange."""
+    (with the default thresholds, <=25% is 1, <=50% 2, <=75% 3, above 4). An
+    active day (usage or sessions) with no 5-hour reading above 0, such as a day
+    before tracking started, is level 1, so its sections get the lightest orange."""
     if peak is not None and peak > 0:
         return level_for(peak, thresholds)
-    return 1 if used > EPSILON else 0
+    return 1 if active else 0
 
 
 # --- output --------------------------------------------------------------------------------
@@ -277,10 +320,12 @@ def build(inputs, today, config, generated_at):
     readings = inputs["readings"]
     usage = {d: u for d, u in weekly_usage_by_day(readings, config).items() if d <= today}
     five_hour = five_hour_by_day(readings)
+    windows = five_hour_windows_by_day(readings, config)
     code = code_sessions_by_day(inputs["activity"], readings, inputs["sessions"])
     chats = chats_by_day(inputs["chats"])
 
     active_days = sorted(d for d in set(usage) | set(five_hour) | set(code) | set(chats) if d <= today)
+    section_source, section_thresholds = battery_thresholds(config)
     totals, detail_days = {}, {}
     for day in active_days:
         used = usage.get(day, 0.0)
@@ -288,11 +333,14 @@ def build(inputs, today, config, generated_at):
         inferred = used > EPSILON and n_code + n_chat == 0
         totals[day] = 1 if inferred else n_code + n_chat
         peak, samples = five_hour.get(day, (None, 0))
+        day_windows = windows.get(day, [])
         detail_days[day] = {
             "usage_pp": round(used, 2),
             "share_fraction": round(used / (100.0 / config["days_per_week"]), 3),
-            "sections": sections_for(used, config),
+            "sections": (usage_sections(used, config) if section_source == "usage"
+                         else session_sections(totals[day], section_thresholds)),
             "peak_five_hour_pct": peak, "five_hour_samples": samples,
+            "five_hour_windows": day_windows, "afterburner": is_afterburner(day_windows, config),
             "sessions": totals[day], "sessions_code": n_code, "sessions_chat": n_chat,
             "inferred_session": inferred,
             "code_sessions": sorted(code.get(day, {}).values(), key=lambda s: s["first_ts"]),
@@ -306,15 +354,16 @@ def build(inputs, today, config, generated_at):
         mode = "five_hour"
         nonzero_days = sum(1 for detail in detail_days.values() if (detail["peak_five_hour_pct"] or 0) > 0)
         for detail in detail_days.values():
-            detail["level"] = five_hour_level(detail["peak_five_hour_pct"], detail["usage_pp"], thresholds)
+            active = detail["usage_pp"] > EPSILON or detail["sessions"] > 0
+            detail["level"] = five_hour_level(detail["peak_five_hour_pct"], active, thresholds)
     else:
         mode, thresholds, nonzero_days = level_thresholds(totals, today, config)
         for detail in detail_days.values():
             detail["level"] = level_for(detail["sessions"], thresholds)
 
-    # Days before the first weekly reading ever recorded have no usage data: the
-    # grid draws them as a battery in the darker no-data color, unlike a tracked
-    # day with 0 usage (an empty battery).
+    # Days before the first weekly reading ever recorded have no usage data
+    # (usage_known false). Their batteries still fill with sessions, and the
+    # tooltips and day view say "no usage data".
     first_reading = next((r["ts"] for r in readings if common.normalize_window(r.get("seven_day"))), None)
     usage_since = day_of(first_reading) if first_reading is not None else None
     grid_start = sunday_on_or_before(today) - timedelta(weeks=config["grid_weeks"] - 1)
@@ -328,6 +377,7 @@ def build(inputs, today, config, generated_at):
             "sections": detail["sections"] if detail else 0,
             "sessions": detail["sessions"] if detail else 0,
             "level": detail["level"] if detail else 0,
+            "afterburner": detail["afterburner"] if detail else False,
             "usage_known": usage_since is not None and day >= usage_since,
         })
         day += timedelta(days=1)
@@ -343,7 +393,9 @@ def build(inputs, today, config, generated_at):
     snapshot = {
         "version": SNAPSHOT_VERSION, "generated_at": generated_at, "today": today.isoformat(),
         "week_start": "sunday", "usage_tracked_since": usage_since.isoformat() if usage_since else None,
-        "section_count": len(config["section_thresholds"]) + 1,
+        "section_count": len(section_thresholds) + 1,
+        "battery": {"source": section_source, "thresholds": section_thresholds},
+        "afterburner": {"maxed_pct": config["afterburner_maxed_pct"], "other_pct": config["afterburner_other_pct"]},
         "chats": chat_import_status(inputs["chats"], today, config),
         "header": header, "levels": levels, "days": grid,
     }

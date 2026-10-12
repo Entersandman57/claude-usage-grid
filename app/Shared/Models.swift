@@ -10,13 +10,45 @@ struct Snapshot: Codable, Equatable {
     var today: String
     var usageTrackedSince: String?
     var sectionCount: Int?
+    var battery: BatteryRule?
+    var afterburner: AfterburnerRule?
     var chats: ChatImportStatus?
     var header: Header
     var levels: Levels
     var days: [GridDay]
 
-    /// Battery sections per cell (section_thresholds + 1 in the aggregator config).
+    /// Battery sections per cell (the battery thresholds + 1).
     var sectionsPerCell: Int { max(1, sectionCount ?? 3) }
+
+    /// True when the sections count sessions (the default); false: the day's share of the week.
+    var batteryCountsSessions: Bool { (battery?.source ?? "sessions") == "sessions" }
+}
+
+/// What fills a cell's battery: "sessions" (counts) or "usage" (share of the week).
+struct BatteryRule: Codable, Equatable {
+    var source: String
+    var thresholds: [Double]
+
+    /// Session counts per filled-section count, for the legend: ["0", "1", "2–4", "5+"].
+    var sessionLabels: [String] {
+        let bounds = thresholds.map { Int($0.rounded(.down)) }
+        var labels = ["0"]
+        var low = 1
+        for high in bounds {
+            labels.append(high <= low ? "\(high)" : "\(low)–\(high)")
+            low = high + 1
+        }
+        labels.append("\(low)+")
+        return labels
+    }
+}
+
+/// The afterburner glow: a 5-hour window at maxedPct and another above otherPct the same day.
+struct AfterburnerRule: Codable, Equatable {
+    var maxedPct: Double
+    var otherPct: Double
+
+    static let standard = AfterburnerRule(maxedPct: 100, otherPct: 10)
 }
 
 /// How current the claude.ai chat import is; `remind` once it's older than
@@ -60,8 +92,9 @@ struct GridDay: Codable, Equatable, Identifiable {
     var usagePp: Double
     var sections: Int      // filled battery sections
     var sessions: Int
-    var level: Int         // session level 1-4 (0: no sessions)
-    var usageKnown: Bool   // false: before tracking started (no data)
+    var level: Int         // orange level 1-4 (0: nothing that day)
+    var usageKnown: Bool   // false: before tracking started (no usage data)
+    var afterburner: Bool? = nil  // maxed out a 5-hour window and kept going in another
     var id: String { date }
 }
 
@@ -81,6 +114,8 @@ struct DayDetail: Codable {
     var sections: Int
     var peakFiveHourPct: Double?
     var fiveHourSamples: Int
+    var fiveHourWindows: [FiveHourWindow]?
+    var afterburner: Bool?
     var sessions: Int
     var sessionsCode: Int
     var sessionsChat: Int
@@ -88,6 +123,27 @@ struct DayDetail: Codable {
     var level: Int
     var codeSessions: [CodeSession]
     var chats: [Chat]
+}
+
+/// One 5-hour window read during the day, with its highest reading.
+struct FiveHourWindow: Codable, Equatable {
+    var resetsAt: Double
+    var peakPct: Double
+    var samples: Int
+}
+
+extension DayDetail {
+    /// "Maxed out a 5-hour window, then used 31% of another", or nil if not an afterburner day.
+    var afterburnerText: String? {
+        guard afterburner == true, let windows = fiveHourWindows,
+              let maxed = windows.max(by: { $0.peakPct < $1.peakPct }) else { return nil }
+        let others = windows.filter { $0 != maxed }
+        if others.contains(where: { $0.peakPct >= maxed.peakPct }) {
+            return "Maxed out two 5-hour windows"
+        }
+        let other = others.map(\.peakPct).max() ?? 0
+        return "Maxed out a 5-hour window, then used \(Format.percent(other)) of another"
+    }
 }
 
 struct CodeSession: Codable, Identifiable {

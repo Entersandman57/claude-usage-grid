@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
-"""Daily plan-usage reading ("meter") from the smallest possible `claude -p` call.
+"""Plan-usage readings ("meter") from the smallest possible `claude -p` call.
 
 launchd starts `meter.py --scheduled` every hour at :55. It makes at most one
-automatic call per local day, at that day's slot:
-  * on the day the weekly window resets: the last :55 wake-up before the reset,
-    so the day's pre-reset usage is read before the window starts over;
-  * every other day, or if that pre-reset moment was missed: 23:55.
-A slot missed because the Mac was off or asleep past midnight is skipped, and a
-failed call is never retried. `meter.py --now` takes a manual reading and does
-not use up the day's automatic run.
+automatic call per slot:
+  * every meter_interval_hours (config.json, default 3) counting back from
+    23:55, so 02:55, 05:55 ... 20:55 and 23:55, the day's last reading;
+  * on the day the weekly window resets, also the last :55 wake-up before the
+    reset, so the day's pre-reset usage is read before the window starts over.
+A slot missed while the Mac was asleep runs on wake, until the next slot starts
+or midnight, whichever is first; a failed call is never retried. `meter.py
+--now` takes a manual reading and does not use up a slot.
 
 Both windows come from the stream-json rate_limit_event's `unifiedWindows`
 (undocumented; 0-1 fractions, stored as 0-100 percentages like the status
@@ -21,13 +22,15 @@ import os
 import subprocess
 import sys
 import time
-from datetime import datetime, timedelta
+from datetime import datetime, time as clock, timedelta
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import common  # noqa: E402
 
 WEEK_SECONDS = 7 * 24 * 3600
 SLOT_MINUTE = 55
+LAST_SLOT_HOUR = 23  # every day's last automatic reading is at 23:55
+DEFAULT_INTERVAL_HOURS = 3
 PRE_RESET_MARGIN = timedelta(minutes=3)
 RESET_GUARD = timedelta(seconds=60)
 LAUNCHD_SLACK = timedelta(seconds=30)
@@ -63,21 +66,54 @@ def pre_reset_slot(reset):
     return slot
 
 
-def due_run(now_ts, last_auto_day, known_reset):
-    """The automatic run due at now_ts: "pre_reset", "nightly" or None."""
+def interval_hours(config):
+    """Hours between automatic readings: config.json's meter_interval_hours (1-24), default 3."""
+    value = config.get("meter_interval_hours", DEFAULT_INTERVAL_HOURS)
+    if isinstance(value, int) and not isinstance(value, bool) and 1 <= value <= 24:
+        return value
+    return DEFAULT_INTERVAL_HOURS
+
+
+def regular_slots(day, interval):
+    """The day's hh:55 slots: 23:55 and every `interval` hours before it."""
+    return [datetime.combine(day, clock(hour, SLOT_MINUTE))
+            for hour in range(LAST_SLOT_HOUR % interval, 24, interval)]
+
+
+def due_run(now_ts, last_slot, known_reset, interval=DEFAULT_INTERVAL_HOURS):
+    """(trigger, slot) for the automatic run due at now_ts, or None.
+
+    The slot is the latest of today's slots that has started (launchd may wake
+    a few seconds early), as "YYYY-MM-DDTHH:MM"; it is due unless last_slot is
+    the same or later. trigger is "pre_reset" for the slot before a weekly
+    reset, otherwise "scheduled".
+    """
     now = local(now_ts)
-    if last_auto_day == now.date().isoformat():
-        return None
+    soon = now + LAUNCHD_SLACK
+    candidates = [(slot, "scheduled") for slot in regular_slots(now.date(), interval) if slot <= soon]
     reset_ts = upcoming_reset(known_reset, now_ts)
     if reset_ts is not None:
         reset = local(reset_ts)
         slot = pre_reset_slot(reset)
-        if (reset.date() == now.date() and slot.date() == now.date()
-                and now + LAUNCHD_SLACK >= slot and now < reset - RESET_GUARD):
-            return "pre_reset"
-    nightly = now.replace(hour=23, minute=SLOT_MINUTE, second=0, microsecond=0)
-    if now + LAUNCHD_SLACK >= nightly:
-        return "nightly"
+        if reset.date() == now.date() == slot.date() and slot <= soon and now < reset - RESET_GUARD:
+            candidates.append((slot, "pre_reset"))
+    if not candidates:
+        return None
+    slot, trigger = max(candidates, key=lambda candidate: (candidate[0], candidate[1] == "pre_reset"))
+    slot_id = slot.strftime("%Y-%m-%dT%H:%M")
+    if last_slot and last_slot >= slot_id:
+        return None
+    return trigger, slot_id
+
+
+def last_auto_slot(state):
+    """The last automatic slot run. State from the once-a-day meter has no
+    last_auto_slot, so its last automatic run's time stands in."""
+    if state.get("last_auto_slot"):
+        return state["last_auto_slot"]
+    run = state.get("last_run") or {}
+    if run.get("trigger") in ("nightly", "pre_reset") and common.is_number(run.get("ts")):
+        return local(run["ts"]).strftime("%Y-%m-%dT%H:%M")
     return None
 
 
@@ -113,8 +149,11 @@ def parse_rate_limit_info(info):
             if isinstance(window, dict) and common.is_number(window.get("utilization")):
                 windows[name] = _window(window["utilization"], window.get("resetsAt"))
     name = info.get("rateLimitType")
-    if name in WINDOWS and name not in windows and common.is_number(info.get("utilization")):
-        windows[name] = _window(info["utilization"], info.get("resetsAt"))
+    if name in WINDOWS and name not in windows:
+        if common.is_number(info.get("utilization")):
+            windows[name] = _window(info["utilization"], info.get("resetsAt"))
+        elif info.get("status") == "rejected":  # refused for this window: it's at its limit
+            windows[name] = _window(1.0, info.get("resetsAt"))
     return windows
 
 
@@ -199,7 +238,7 @@ def take_reading(trigger, config):
 
 
 def refresh_sessions():
-    """Best effort: refresh sessions.json with the SDK venv after the nightly run."""
+    """Best effort: refresh sessions.json with the SDK venv after a scheduled run."""
     python = common.path("venv", "bin", "python")
     script = os.path.join(os.path.dirname(os.path.abspath(__file__)), "backfill.py")
     if not (os.path.exists(python) and os.path.exists(script)):
@@ -227,7 +266,7 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description="Take a plan-usage reading with a tiny claude -p call.")
     mode = parser.add_mutually_exclusive_group(required=True)
     mode.add_argument("--scheduled", action="store_true",
-                      help="launchd entry point: read only if today's automatic slot is due")
+                      help="launchd entry point: read only if an automatic slot is due")
     mode.add_argument("--now", action="store_true", help="take a manual reading now")
     mode.add_argument("--status", action="store_true", help="print the meter state")
     args = parser.parse_args(argv)
@@ -243,18 +282,18 @@ def main(argv=None):
     lock = acquire_lock()
     if lock is None:
         return 0
+    config = common.read_json(common.path("config.json"), {}) or {}
     if args.scheduled:
-        now_ts = common.now()
-        trigger = due_run(now_ts, state.get("last_auto_day"), known_weekly_reset(state))
-        if trigger is None:
+        due = due_run(common.now(), last_auto_slot(state), known_weekly_reset(state), interval_hours(config))
+        if due is None:
             return 0
-        # Record the day before calling claude, so a failed run is never retried.
-        state["last_auto_day"] = local(now_ts).date().isoformat()
+        trigger, slot = due
+        # Record the slot before calling claude, so a failed run is never retried.
+        state["last_auto_slot"], state["last_auto_day"] = slot, slot[:10]
         common.write_json_atomic(state_path, state)
     else:
         trigger = "manual"
 
-    config = common.read_json(common.path("config.json"), {}) or {}
     run, windows = take_reading(trigger, config)
     state["last_run"] = run
     seven_day = windows.get("seven_day") or {}

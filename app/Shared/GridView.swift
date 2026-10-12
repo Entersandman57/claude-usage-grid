@@ -185,10 +185,11 @@ extension Snapshot {
     static let placeholder = sample(trackedWeeks: 17)
 
     /// Made-up data that shows every cell state. Tracking starts on the
-    /// Wednesday `trackedWeeks - 1` weeks before this one, so the oldest visible
-    /// column opens with no-data squares. The four full weeks before this one
-    /// hold a key: one column per session level 1-4 (left to right), with
-    /// Sunday-Wednesday filled 0, 1, 2 and 3 sections. Other days are random.
+    /// Wednesday `trackedWeeks - 1` weeks before this one (no usage data before
+    /// it; batteries still fill with sessions). The four full weeks before this
+    /// one hold a key: one column per orange level 1-4 (left to right), with
+    /// Sunday-Wednesday filled 0, 1, 2 and 3 sections, and an afterburner on the
+    /// last column's Saturday. Other days are random, a few of them afterburners.
     static func sample(trackedWeeks: Int, today: Date = Date()) -> Snapshot {
         let calendar = Format.calendar
         let weekday = calendar.component(.weekday, from: today) - 1  // Sunday = 0
@@ -204,19 +205,26 @@ extension Snapshot {
             let week = offset / 7, row = offset % 7
             var sections = roll % 5 == 0 ? 0 : 1 + roll % 3
             var level = 1 + (roll / 7) % 4
-            if (currentWeek - 4..<currentWeek).contains(week), row < 4 {
-                level = week - (currentWeek - 4) + 1
-                sections = row
+            var afterburner = roll % 29 == 0
+            if (currentWeek - 4..<currentWeek).contains(week) {
+                if row < 4 {
+                    level = week - (currentWeek - 4) + 1
+                    sections = row
+                }
+                afterburner = week == currentWeek - 1 && row == 6
             }
+            if afterburner { (level, sections) = (4, 3) }
             let date = calendar.date(byAdding: .day, value: offset, to: start)!
-            days.append(GridDay(date: Format.iso(date), usagePp: Double(sections) * 4.5, sections: sections,
-                                sessions: level * 2, level: level, usageKnown: offset >= firstTracked))
+            days.append(GridDay(date: Format.iso(date), usagePp: Double(level) * 4.5, sections: sections,
+                                sessions: [0, 1, 3, 6][sections], level: level,
+                                usageKnown: offset >= firstTracked, afterburner: afterburner))
         }
         return Snapshot(version: 1, generatedAt: today.timeIntervalSince1970, today: Format.iso(today),
                         usageTrackedSince: days[max(0, min(firstTracked, days.count - 1))].date, sectionCount: 3,
+                        battery: BatteryRule(source: "sessions", thresholds: [1, 4]), afterburner: .standard,
                         header: Header(week: UsageWindow(usedPct: 42, resetsAt: nil, asOf: 0, source: nil),
                                        fiveHour: UsageWindow(usedPct: 18, resetsAt: nil, asOf: 0, source: nil),
                                        todayUsagePp: 6, todaySessions: 3),
-                        levels: Levels(mode: "fixed", thresholds: [1, 3, 6], nonzeroDays: 0), days: days)
+                        levels: Levels(mode: "five_hour", thresholds: [25, 50, 75], nonzeroDays: 0), days: days)
     }
 }

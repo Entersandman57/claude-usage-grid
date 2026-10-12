@@ -281,18 +281,21 @@ final class DataStore: ObservableObject {
         var parts = [Format.mediumDay(day.date)]
         let detail = details?.days[day.date]
         let sectionCount = snapshot?.sectionsPerCell ?? 3
-        parts.append(!day.usageKnown ? "before tracking started (no usage data)"
-                     : day.sections == 0 ? "\(Format.percent(day.usagePp)) of week (empty battery)"
-                     : "\(Format.percent(day.usagePp)) of week (\(day.sections) of \(sectionCount) sections)")
+        let bars = day.sections == 0 ? "empty battery" : "\(day.sections) of \(sectionCount) bars"
+        let countsSessions = snapshot?.batteryCountsSessions ?? true
+        if detail?.inferredSession == true {
+            parts.append("1 session (usage, but no session recorded)" + (countsSessions ? " (\(bars))" : ""))
+        } else {
+            let code = detail?.sessionsCode ?? 0, chats = detail?.sessionsChat ?? 0
+            parts.append("\(Format.sessions(day.sessions)): \(code) Code, \(chats) chat\(chats == 1 ? "" : "s")"
+                         + (countsSessions ? " (\(bars))" : ""))
+        }
+        parts.append(!day.usageKnown ? "before usage tracking started"
+                     : "\(Format.percent(day.usagePp)) of week" + (countsSessions ? "" : " (\(bars))"))
         if let detail, let peak = detail.peakFiveHourPct {
             parts.append("peak 5h \(Format.percent(peak))" + (detail.fiveHourSamples == 1 ? " (1 reading)" : ""))
         }
-        if detail?.inferredSession == true {
-            parts.append("1 session (usage, but no session recorded)")
-        } else {
-            let code = detail?.sessionsCode ?? 0, chats = detail?.sessionsChat ?? 0
-            parts.append("\(Format.sessions(day.sessions)): \(code) Code, \(chats) chat\(chats == 1 ? "" : "s")")
-        }
+        if let afterburner = detail?.afterburnerText { parts.append("🔥 " + afterburner) }
         return parts.joined(separator: " · ")
     }
 

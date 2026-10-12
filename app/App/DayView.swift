@@ -30,6 +30,11 @@ struct DayContent: View {
                 Text(Format.longDay(date)).font(.title2.weight(.semibold))
             }
             .frame(height: 35)  // keeps the cell on whole pixels
+            if let afterburner = detail?.afterburnerText {
+                Label(afterburner + ": afterburner day.", systemImage: "flame.fill")
+                    .font(.callout.weight(.semibold))
+                    .foregroundStyle(Palette.afterburnerGlow)
+            }
             stats(detail: detail, day: day)
             codeSessions(detail?.codeSessions ?? [])
             chats(detail?.chats ?? [])
@@ -43,22 +48,28 @@ struct DayContent: View {
     private func stats(detail: DayDetail?, day: GridDay?) -> some View {
         let known = day?.usageKnown ?? false
         let usage = detail?.usagePp ?? 0
+        let countsSessions = store.snapshot?.batteryCountsSessions ?? true
+        let bars = "\(detail?.sections ?? 0) of \(sectionCount) bars"
+        let windows = detail?.fiveHourWindows ?? []
         return HStack(alignment: .top, spacing: 12) {
+            StatTile(title: "Sessions",
+                     value: "\(detail?.sessions ?? 0)",
+                     note: (detail?.inferredSession == true
+                            ? "usage, but none recorded"
+                            : "\(detail?.sessionsCode ?? 0) Code · \(detail?.sessionsChat ?? 0) chats")
+                        + (countsSessions ? " · \(bars)" : ""))
             StatTile(title: "Weekly limit used",
                      value: known ? Format.percent(usage) : "—",
-                     note: known ? "percentage points of the week" : "not tracked yet")
-            StatTile(title: "Battery",
-                     value: known ? "\(detail?.sections ?? 0) of \(sectionCount)" : "—",
-                     note: known ? "\(Int(((detail?.shareFraction ?? 0) * 100).rounded()))% of a day's even share"
-                                 : "no data yet")
+                     note: !known ? "not tracked yet"
+                        : countsSessions ? "percentage points of the week"
+                        : "\(bars), \(Int(((detail?.shareFraction ?? 0) * 100).rounded()))% of a day's even share")
             StatTile(title: "Peak 5-hour",
                      value: detail?.peakFiveHourPct.map(Format.percent) ?? "—",
                      note: readingsNote(detail?.fiveHourSamples ?? 0))
-            StatTile(title: "Sessions",
-                     value: "\(detail?.sessions ?? 0)",
-                     note: detail?.inferredSession == true
-                        ? "usage, but none recorded"
-                        : "\(detail?.sessionsCode ?? 0) Code · \(detail?.sessionsChat ?? 0) chats")
+            StatTile(title: "5-hour windows",
+                     value: windows.isEmpty ? "—" : "\(windows.count)",
+                     note: windows.isEmpty ? "none read"
+                        : "peaks " + windows.map { Format.percent($0.peakPct) }.joined(separator: " · "))
         }
     }
 
