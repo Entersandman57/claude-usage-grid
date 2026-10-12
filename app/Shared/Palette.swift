@@ -15,11 +15,12 @@ enum Palette {
     static let background = Color(hex: 0x17181c)  // also shows through the section dividers
     static let unfilled = Color(hex: 0x2e3037)    // an unfilled battery section (also days with no data)
     static let surface = Color(hex: 0x24262b)     // cards in the app's windows
-    /// Orange levels 1-4 (peak 5-hour %): light and whitish for a quiet day, deep and vivid near the limit.
-    static let levels = [Color(hex: 0xFDE5D2), Color(hex: 0xFAB27E), Color(hex: 0xF07A2A), Color(hex: 0xCC5500)]
-    /// Afterburner: a pale, hot yellow rim with an orange glow around the cell.
-    static let afterburnerRim = Color(hex: 0xFFE7A8)
-    static let afterburnerGlow = Color(hex: 0xFF9F2E)
+    /// Orange levels 1-4 (peak 5-hour %), shades of #D97757 (hue 15°): light and
+    /// whitish for a quiet day, the base color at level 3, deep rust near the limit.
+    static let levels = [Color(hex: 0xF6D6CB), Color(hex: 0xE7A48D), Color(hex: 0xD97757), Color(hex: 0xB8502E)]
+    /// Afterburner: a pale peach rim with a bright #D97757-family glow around the cell.
+    static let afterburnerRim = Color(hex: 0xFCE6DC)
+    static let afterburnerGlow = Color(hex: 0xF0916C)
 }
 
 /// How cells are painted.

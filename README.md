@@ -46,11 +46,11 @@ Sessions are known further back than usage (chats go back as far as your export)
 
 | Peak 5-hour % that day | up to 25% | up to 50% | up to 75% | above 75% |
 |---|---|---|---|---|
-| Filled section color | `#FDE5D2` | `#FAB27E` | `#F07A2A` | `#CC5500` |
+| Filled section color | `#F6D6CB` | `#E7A48D` | `#D97757` | `#B8502E` |
 
 A day with usage or sessions but no 5-hour reading (such as a day before tracking started) gets the lightest orange. The peak is only as good as the readings behind it; see [Known limitations](#known-limitations). To color by session count instead (Claude Code sessions plus claude.ai chats, ranked against your own history), set `"level_source": "sessions"` in the config.
 
-**Afterburner.** A day glows, with a pale yellow rim (`#FFE7A8`) and an orange halo (`#FF9F2E`), when its 5-hour windows show you running hot and then going again:
+**Afterburner.** A day glows, with a pale peach rim (`#FCE6DC`) and a bright halo (`#F0916C`), when its 5-hour windows show you running hot and then going again:
 
 - one window was maxed out (100%) and another that day went over 10%, or
 - one window went over 80% and a later window that day went over 21%. Any later window counts, so a near-empty window in between (for example one started by a meter call) doesn't break it.
