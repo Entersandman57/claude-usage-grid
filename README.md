@@ -89,9 +89,15 @@ These counts fill the battery (above).
 
 **The orange** comes from the day's peak 5-hour %, in fixed quarters of the 5-hour limit (`five_hour_level_thresholds`: 25, 50, 75). With `"level_source": "sessions"`, it comes from session counts instead: quartiles of your days with sessions over the last 365 days, each at least one session above the previous one, and fixed buckets (1, 2–3, 4–6, 7+) until you have 14 such days. Sessions always show in tooltips, the day view and the large widget's header.
 
-## Importing your claude.ai chats
+## Chats from the Claude app
 
-Claude Code sessions are picked up automatically. Chats in claude.ai (or in the desktop app's Chat tab) come from Anthropic's data export:
+Claude Code sessions are picked up automatically, and so are claude.ai chats: every 10 minutes the app runs `app_scan.py`, which reads the Claude desktop app's cached chat list (the one its sidebar loads) and records each chat's ID, title and the day of its latest activity. Chats from your phone or the web are in that list too, once the desktop app has refreshed it, which it does while it's open. Each scan adds any new days, so a chat used across several days counts on each day the app's list was refreshed. If the desktop app stays closed for a few days, a chat used on several of those days only counts on its latest one.
+
+The scan reads only `Cache/Cache_Data` (only entries that are chat lists or conversations, past their URL) and `plan-usage-history.json` under `~/Library/Application Support/Claude`, always from a temporary copy that it deletes afterwards. It never writes to that folder and never opens cookies, local storage, drafts or config files. Message text and chat summaries are never kept. `plan-usage-history.json` is the app's own record of your 5-hour and weekly %; its samples become readings (source `app_history`), which is why tracking reaches back to Sep 10, 2026. It isn't written regularly (nothing after Oct 10, 2026), so the meter is still needed. Both formats are undocumented: if they change, the status list's "Chats from the Claude app" line stops growing and the chat bubble returns after 7 days.
+
+## Importing your claude.ai export (optional)
+
+The export is never required. It fills in days the scan missed, and for the days it covers it wins over the scan:
 
 1. On claude.ai, go to **Settings → Privacy → Export data**. The email links to a small **manifest** JSON that lists several files to download.
 2. Download **`conversations-000.zip`** from it (the other files aren't needed). Each link in the manifest works only once.
@@ -115,7 +121,8 @@ Claude Code deletes transcripts after `cleanupPeriodDays` (30 by default); after
 | `~/.claude-usage-grid/readings.jsonl` | usage readings: time, source, both windows' % and reset times, session ID and title for status-line readings |
 | `~/.claude-usage-grid/activity.jsonl` | hook events: time, event, session ID, folder, surface (e.g. `claude-desktop`) |
 | `~/.claude-usage-grid/sessions.json` | Claude Code sessions from `list_sessions()`: ID, title, folder, first and last time, whether the transcript still exists |
-| `~/.claude-usage-grid/chats.json` | claude.ai chats: ID, title, days with messages |
+| `~/.claude-usage-grid/chats.json` | claude.ai chats from the export: ID, title, days with messages |
+| `~/.claude-usage-grid/app-chats.json` | chats from the Claude app's cache: ID, title, days seen active |
 | `~/.claude-usage-grid/meter-runs.jsonl`, `state/`, `logs/` | meter results and errors, collector state |
 | `~/.claude-usage-grid/out/` | what the aggregator computes for the app |
 | `~/.claude-usage-grid/bin/`, `venv/`, `backups/` | installed scripts, the Agent SDK, `settings.json` backups |
@@ -132,7 +139,7 @@ Titles are your own titles or Claude's auto-generated ones; a session's first pr
 - **Readings are spaced out with the desktop app.** Usage is read when the terminal CLI responds, every 3 hours by the meter, and when you press Update Now. A day's usage is credited to the day of the reading that observed it: if the Mac is asleep through midnight, usage from late that day lands on the next reading's day, and if it's off at reading time, that day's usage lands on the next reading's day.
 - **Peak 5-hour % and afterburners are sampled.** The peak is the highest 5-hour % among the day's readings, so a window that climbed and reset between two readings 3 hours apart can be missed or read low, and so can an afterburner. Before Oct 11, 2026 there was one reading a night, and busy days could get a light orange (Oct 8: 12 points of the week used, one reading at 2%). An afterburner needs a reading at 100%; that's likely when you're locked out for more than a few hours, and pressing Update Now when you hit the limit makes sure. Whether the meter still gets usage numbers while you're locked out hasn't been tested yet; if the response only says the request was refused for the 5-hour window, the meter records that window at 100%.
 - **Other machines and the cloud.** Sessions on other Macs and cloud sessions aren't counted, though their usage is in the %.
-- **Chats after your last import** aren't counted until the next import (the orange bubble reminds you after 7 days). There's no documented way to see claude.ai chats as they happen.
+- **Chats depend on the desktop app's cache.** A chat counts once the Claude desktop app has loaded its chat list; days when the app wasn't opened only show a chat's latest activity. The cache layout and chat-list format are undocumented and may change.
 - **Undocumented fields.** The meter reads both windows from the stream's `rate_limit_event` → `unifiedWindows`, which isn't documented and may change. If it does, the status list shows "no utilization in output" and the meter needs an update.
 - **Small manual resets.** A manual limit reset of less than 3 points looks like rounding noise and isn't treated as a reset.
 - **Widget refreshes.** macOS may delay widget updates; the app asks for one whenever the grid changes, and the widget also asks every 30 minutes and just after midnight.

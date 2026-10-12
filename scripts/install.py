@@ -36,6 +36,7 @@ HOOK_TIMEOUT_SECONDS = 5
 INSTALLED_FILES = (  # (repo directory, file) -> ~/.claude-usage-grid/bin/file
     ("collectors", "common.py"), ("collectors", "statusline.py"), ("collectors", "hook.py"),
     ("collectors", "meter.py"), ("collectors", "backfill.py"), ("collectors", "import_chats.py"),
+    ("collectors", "app_scan.py"),
     ("aggregator", "aggregate.py"), ("aggregator", "aggregator-config.json"),
 )
 

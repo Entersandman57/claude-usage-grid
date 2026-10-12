@@ -30,12 +30,13 @@ final class DataStore: ObservableObject {
     let dataDir: URL = ProcessInfo.processInfo.environment["CLAUDE_USAGE_GRID_HOME"].map { URL(fileURLWithPath: $0) }
         ?? FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent(".claude-usage-grid")
 
-    private static let watchedFiles = ["readings.jsonl", "activity.jsonl", "sessions.json", "chats.json",
+    private static let watchedFiles = ["readings.jsonl", "activity.jsonl", "sessions.json", "chats.json", "app-chats.json",
                                        "state/meter.json", "aggregator-config.json"]
     private var timer: Timer?
     private var seenModified: [String: Date?] = [:]
     private var seenDay = Format.iso(Date())
     private var lastBackfill = Date.distantPast
+    private var lastAppScan = Date.distantPast
     private var isRefreshing = false
     private var refreshAgain = false
 
@@ -79,6 +80,7 @@ final class DataStore: ObservableObject {
 
     func refresh() {
         launchAtLogin = LoginItem.isEnabled
+        scanAppIfDue()
         guard !isRefreshing else { refreshAgain = true; return }
         isRefreshing = true
         let dataDir = self.dataDir
@@ -135,6 +137,18 @@ final class DataStore: ObservableObject {
         Task.detached(priority: .utility) {
             try? DataStore.run(dataDir.appendingPathComponent("venv/bin/python").path,
                                [dataDir.appendingPathComponent("bin/backfill.py").path])
+        }
+    }
+
+    /// Chats and usage samples from the Claude desktop app's local data (app_scan.py),
+    /// every 10 minutes; its app-chats.json and readings.jsonl changes trigger a refresh.
+    private func scanAppIfDue() {
+        guard Date().timeIntervalSince(lastAppScan) > 600 else { return }
+        lastAppScan = Date()
+        let dataDir = self.dataDir
+        Task.detached(priority: .utility) {
+            try? DataStore.run(dataDir.appendingPathComponent("venv/bin/python").path,
+                               [dataDir.appendingPathComponent("bin/app_scan.py").path])
         }
     }
 
@@ -317,6 +331,9 @@ final class DataStore: ObservableObject {
                 lines.append("Last meter run: \(Format.moment(ts)), \(run.trigger ?? "?"), \(result)")
             } else {
                 lines.append("Last meter run: none yet")
+            }
+            if let scanned = status.appChatsScannedAt {
+                lines.append("Chats from the Claude app: \(status.appChatsCount ?? 0) seen, last scan \(Format.moment(scanned))")
             }
             if let through = status.chatsImportedThrough {
                 let when = status.chatsImportedAt.map { " (last import \(Format.moment($0)))" } ?? ""

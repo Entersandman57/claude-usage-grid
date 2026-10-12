@@ -448,3 +448,19 @@ def test_cli_writes_outputs_and_skips_malformed_lines(grid_home):
     assert snapshot["days"][-1]["sessions"] == 1
     assert details["status"]["last_reading"]["source"] == "meter"
     assert details["status"]["hooks_first_ts"] == 1790780831.1
+
+
+def test_scanned_chats_merge_and_the_export_wins_for_its_days(new_york):
+    export = {"imported_through": "2026-10-10",
+              "chats": {"c1": {"uuid": "c1", "title": "Export title", "days": ["2026-10-08"]}}}
+    app = {"last_found_at": local_epoch(2026, 10, 12, 9, 0),
+           "chats": {"c1": {"uuid": "c1", "title": "App title", "days": ["2026-10-09", "2026-10-12"]},
+                     "c2": {"uuid": "c2", "title": "New", "days": ["2026-10-12"]}}}
+    snapshot, details = aggregate.build(dict(inputs(chats=export), app_chats=app), date(2026, 10, 12), CONFIG, 0)
+    days = details["days"]
+    assert days["2026-10-08"]["sessions_chat"] == 1
+    assert "2026-10-09" not in days                    # covered by the export, which says no
+    assert days["2026-10-12"]["sessions_chat"] == 2    # after the export: both count
+    assert [c["title"] for c in days["2026-10-12"]["chats"]] == ["Export title", "New"]
+    assert snapshot["chats"] == {"imported_through": "2026-10-12", "days_since": 0, "remind": False}
+    assert details["status"]["app_chats_count"] == 2

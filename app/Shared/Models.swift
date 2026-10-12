@@ -67,10 +67,10 @@ struct ChatImportStatus: Codable, Equatable {
 
     var reminderText: String {
         guard let through = importedThrough else {
-            return "No claude.ai chats imported yet, so chats aren't counted. Import your data export."
+            return "No chats found yet: the Claude app's chat list hasn't been scanned. Open the Claude app, or import your data export."
         }
         let ago = daysSince.map { $0 == 1 ? " (1 day ago)" : " (\($0) days ago)" } ?? ""
-        return "Chats are imported through \(Format.mediumDay(through))\(ago). Newer chats aren't counted until you import a newer export."
+        return "Chats are counted through \(Format.mediumDay(through))\(ago). Open the Claude app so its chat list refreshes, or import a newer export."
     }
 }
 
@@ -185,6 +185,8 @@ struct Status: Codable {
     var hooksFirstTs: Double?
     var chatsImportedThrough: String?
     var chatsImportedAt: Double?
+    var appChatsScannedAt: Double?
+    var appChatsCount: Int?
 }
 
 struct LastReading: Codable {

@@ -65,6 +65,7 @@ def load_inputs():
         "sessions": sessions.get("sessions") or {},
         "sessions_updated_at": sessions.get("updated_at"),
         "chats": common.read_json(common.path("chats.json"), {}) or {},
+        "app_chats": common.read_json(common.path("app-chats.json"), {}) or {},
         "meter_state": common.read_json(common.path("state", "meter.json"), {}) or {},
     }
 
@@ -240,18 +241,28 @@ def code_sessions_by_day(activity, readings, sessions):
     return days
 
 
-def chats_by_day(chats):
-    """{day: {uuid: {"uuid", "title"}}} from the claude.ai export import."""
+def chats_by_day(chats, app_chats=None):
+    """{day: {uuid: {"uuid", "title"}}} from the claude.ai export import and the
+    desktop app scan (app-chats.json). The export is the source of truth for the
+    days it covers: for a chat it holds, only scanned days after its
+    imported_through are added."""
     days = defaultdict(dict)
-    for chat in (chats.get("chats") or {}).values():
+    exported = chats.get("chats") or {}
+    through = chats.get("imported_through") or ""
+    sources = [(chat, None) for chat in exported.values()]
+    sources += [(chat, through if chat.get("uuid") in exported else None)
+                for chat in ((app_chats or {}).get("chats") or {}).values() if isinstance(chat, dict)]
+    for chat, after in sources:
         if not isinstance(chat, dict) or not chat.get("uuid"):
             continue
+        title = (exported.get(chat["uuid"]) or chat).get("title")
         for day in chat.get("days") or []:
             try:
                 parsed = date.fromisoformat(day)
             except (TypeError, ValueError):
                 continue
-            days[parsed][chat["uuid"]] = {"uuid": chat["uuid"], "title": chat.get("title")}
+            if after is None or day > after:
+                days[parsed][chat["uuid"]] = {"uuid": chat["uuid"], "title": title}
     return days
 
 
@@ -312,11 +323,15 @@ def latest_window(readings, name):
     return None
 
 
-def chat_import_status(chats, today, config):
-    """How current the claude.ai import is. Chats after imported_through aren't
-    counted, so once it's more than chat_reminder_days old (or there's never been
-    an import) the widget and app remind you to import a newer export."""
+def chat_import_status(chats, today, config, app_chats=None):
+    """How current the chat counts are: the later of the export's
+    imported_through and the last day the desktop app scan found chats. Once
+    that's more than chat_reminder_days old (or there are no chats at all) the
+    widget and app show a reminder; with the scan working, it never appears."""
     through = chats.get("imported_through")
+    found_at = (app_chats or {}).get("last_found_at")
+    if common.is_number(found_at):
+        through = max(through or "", day_of(found_at).isoformat())
     try:
         days_since = (today - date.fromisoformat(through)).days if through else None
     except ValueError:
@@ -331,7 +346,7 @@ def build(inputs, today, config, generated_at):
     five_hour = five_hour_by_day(readings)
     windows = five_hour_windows_by_day(readings, config)
     code = code_sessions_by_day(inputs["activity"], readings, inputs["sessions"])
-    chats = chats_by_day(inputs["chats"])
+    chats = chats_by_day(inputs["chats"], inputs.get("app_chats"))
 
     active_days = sorted(d for d in set(usage) | set(five_hour) | set(code) | set(chats) if d <= today)
     section_source, section_thresholds = battery_thresholds(config)
@@ -406,7 +421,7 @@ def build(inputs, today, config, generated_at):
         "battery": {"source": section_source, "thresholds": section_thresholds},
         "afterburner": {"maxed_pct": config["afterburner_maxed_pct"], "other_pct": config["afterburner_other_pct"],
                         "high_pct": config["afterburner_high_pct"], "next_pct": config["afterburner_next_pct"]},
-        "chats": chat_import_status(inputs["chats"], today, config),
+        "chats": chat_import_status(inputs["chats"], today, config, inputs.get("app_chats")),
         "header": header, "levels": levels, "days": grid,
     }
 
@@ -426,6 +441,8 @@ def build(inputs, today, config, generated_at):
             "hooks_first_ts": min((r["ts"] for r in inputs["activity"]), default=None),
             "chats_imported_through": inputs["chats"].get("imported_through"),
             "chats_imported_at": inputs["chats"].get("imported_at"),
+            "app_chats_scanned_at": (inputs.get("app_chats") or {}).get("scanned_at"),
+            "app_chats_count": len((inputs.get("app_chats") or {}).get("chats") or {}),
         },
     }
     return snapshot, details
