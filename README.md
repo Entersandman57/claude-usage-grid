@@ -6,13 +6,13 @@ A macOS desktop widget, styled like GitHub's contribution graph, that charts you
 
 ![The medium widget, with made-up sample data](docs/widget-medium-sample.png)
 
-It runs entirely on your Mac, from documented sources: Claude Code's status line and hooks, one tiny `claude -p` call a day, the Agent SDK's `list_sessions()`, and your claude.ai data export. It never reads your OAuth token, keychain items or browser cookies, never calls undocumented Anthropic endpoints, and never stores chat or prompt text.
+It runs entirely on your Mac: Claude Code's status line and hooks, a tiny `claude -p` call every 3 hours, the Agent SDK's `list_sessions()`, the Claude desktop app's cached chat list and usage log (read from a temporary copy), and optionally your claude.ai data export. It never reads your OAuth token, keychain items, cookies or other login state, never calls undocumented Anthropic endpoints, and never stores chat or prompt text.
 
 ## Setup
 
 You need macOS 26.6 or later, Python 3, Xcode with your Apple ID added (a free Personal Team is enough), Homebrew, and a Claude Pro or Max plan.
 
-1. **Claude Code CLI.** Install it (`curl -fsSL https://claude.ai/install.sh | bash`), run `claude` once and sign in with your subscription. The daily usage reading uses it, even if you only use the desktop app.
+1. **Claude Code CLI.** Install it (`curl -fsSL https://claude.ai/install.sh | bash`), run `claude` once and sign in with your subscription. The automatic usage readings use it, even if you only use the desktop app.
 2. **Collectors.** In this folder:
 
    ```bash
@@ -26,7 +26,7 @@ You need macOS 26.6 or later, Python 3, Xcode with your Apple ID added (a free P
    `make plan` shows the exact change to `~/.claude/settings.json` (a status line and two hooks) and the LaunchAgent, and writes nothing. `make install` backs up `settings.json` first, then installs everything into `~/.claude-usage-grid/`.
 3. **App and widget.** `brew install xcodegen`, then `make app`. It builds, signs with your Personal Team, installs `/Applications/ClaudeUsageGrid.app` and starts it. The first time, click **Always Allow** if macOS asks about the signing key.
 4. **Add the widget.** Right-click the desktop → **Edit Widgets** → search "Claude Usage Grid" → pick medium, large or extra large.
-5. **Import your chats** (optional, repeat whenever you like): see [Importing your claude.ai chats](#importing-your-claudeai-chats).
+5. **Chats** are counted automatically from the Claude desktop app; see [Chats from the Claude app](#chats-from-the-claude-app). Importing a claude.ai export is optional.
 
 The app starts at login (toggle **Launch at Login** in its menu). It lives in the menu bar; if the menu bar is too crowded to show its icon, open the app from Spotlight or Finder and the grid window appears.
 
@@ -82,7 +82,7 @@ The thresholds live in `aggregator/aggregator-config.json`. To override them, co
 **Sessions** on a day are:
 
 - Claude Code sessions active that day, in the terminal, VS Code or the desktop app: the hooks record each session start and each prompt, and status-line readings also mark their session. Sessions from before the hooks were installed come from `list_sessions()`, which only knows their first and last day.
-- claude.ai chats with at least one message that day, from your imported export.
+- claude.ai chats active that day, from the Claude app scan and any imported export.
 - A session that spans several days counts on each of them. A day with usage but no known session counts as 1.
 
 These counts fill the battery (above).
@@ -103,7 +103,7 @@ The export is never required. It fills in days the scan missed, and for the days
 2. Download **`conversations-000.zip`** from it (the other files aren't needed). Each link in the manifest works only once.
 3. Drop the ZIP onto the app's grid window, or click **Import claude.ai Export…** there or in the menu bar menu (⌘I). Dropping the manifest itself tells you which file to get.
 
-Only each chat's ID, title and the days it had messages are kept, in `~/.claude-usage-grid/chats.json`. Message text is never stored: the app imports from a temporary copy of the export and deletes it right away. You can delete the downloaded ZIP afterwards; it contains your full chats. The status list shows "Chats imported through <date>". Chats after that date aren't counted until you import a newer export. Chats count toward the sessions that fill each day's battery (and the tooltips, day view and the large widget's header), not the orange. Once your import is more than 7 days old (`chat_reminder_days` in `aggregator-config.json`), a small orange chat bubble appears in the widget's top-left corner, and the grid window and menu bar menu say so, with the Import button next to it. Newer exports may only cover recent chats; older chats from earlier imports are kept. Re-importing is safe: chats are updated, and chats you've since deleted on claude.ai are kept. Chats that were opened but never had a message are skipped.
+Only each chat's ID, title and the days it had messages are kept, in `~/.claude-usage-grid/chats.json`. Message text is never stored: the app imports from a temporary copy of the export and deletes it right away. You can delete the downloaded ZIP afterwards; it contains your full chats. The status list shows "Chats imported through <date>". Chats count toward the sessions that fill each day's battery (and the tooltips, day view and the large widget's header), not the orange. If neither the app scan nor an import has found chats for more than 7 days (`chat_reminder_days` in `aggregator-config.json`), a small chat bubble appears in the widget's top-left corner, and the grid window and menu bar menu say so; with the scan working, it doesn't appear. Newer exports may only cover recent chats; older chats from earlier imports are kept. Re-importing is safe: chats are updated, and chats you've since deleted on claude.ai are kept. Chats that were opened but never had a message are skipped.
 
 In the day view, **Open in Claude** opens a chat in the desktop app and **Open in Browser** opens `https://claude.ai/chat/<id>`.
 
@@ -135,7 +135,7 @@ Titles are your own titles or Claude's auto-generated ones; a session's first pr
 
 ## Known limitations
 
-- **History starts at install.** Plan usage is only known from the first reading, so earlier days have no orange depth (lightest orange) and can't glow; their batteries still fill with sessions. Claude Code sessions backfill as far as transcripts exist (about 30 days by default); chats go back as far as your export.
+- **History starts at install.** Plan usage is only known from the first reading, so earlier days have no orange depth (lightest orange) and can't glow; their batteries still fill with sessions. Claude Code sessions backfill as far as transcripts exist (about 30 days by default); chats go back as far as the app's cached chat list and any export.
 - **Readings are spaced out with the desktop app.** Usage is read when the terminal CLI responds, every 3 hours by the meter, and when you press Update Now. A day's usage is credited to the day of the reading that observed it: if the Mac is asleep through midnight, usage from late that day lands on the next reading's day, and if it's off at reading time, that day's usage lands on the next reading's day.
 - **Peak 5-hour % and afterburners are sampled.** The peak is the highest 5-hour % among the day's readings, so a window that climbed and reset between two readings 3 hours apart can be missed or read low, and so can an afterburner. Before Oct 11, 2026 there was one reading a night, and busy days could get a light orange (Oct 8: 12 points of the week used, one reading at 2%). An afterburner needs a reading at 100%; that's likely when you're locked out for more than a few hours, and pressing Update Now when you hit the limit makes sure. Whether the meter still gets usage numbers while you're locked out hasn't been tested yet; if the response only says the request was refused for the 5-hour window, the meter records that window at 100%.
 - **Other machines and the cloud.** Sessions on other Macs and cloud sessions aren't counted, though their usage is in the %.
